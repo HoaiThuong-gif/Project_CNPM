@@ -1,0 +1,21 @@
+﻿benh,ten_thuoc,generic_name,cong_dung_ngan,lieu_dung_ngan,tac_dung_phu_ngan,chong_chi_dinh_ngan,canh_bao_ngan
+tieu_duong,glimepiride,GLIMEPIRIDE,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,2 mg uống 1 lần/ngày,Hạ đường huyết; chóng mặt; đau đầu.,Dị ứng glimepiride; tiểu đường type 1; nhiễm toan ceton.,Cảnh giác hạ đường huyết.
+tieu_duong,liraglutide,LIRAGLUTIDE,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,0.6 mg tiêm dưới da 1 lần/ngày,Buồn nôn; nôn; tiêu chảy.,Tiền sử ung thư tuyến giáp thể tuỷ; hội chứng MEN2; dị ứng thuốc.,Thận trọng nguy cơ viêm tụy.
+tieu_duong,dapagliflozin,DAPAGLIFLOZIN,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,5 mg uống 1 lần/ngày,Nhiễm trùng tiết niệu; tiểu nhiều; chóng mặt.,Dị ứng dapagliflozin; suy thận nặng.,Theo dõi mất nước và nhiễm toan ceton.
+tieu_duong,acarbose,ACARBOSE,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,100 mg uống cùng bữa ăn,Đầy hơi; tiêu chảy; đau bụng.,Dị ứng acarbose; bệnh ruột mạn tính; nhiễm toan ceton.,Thận trọng ở bệnh gan.
+tieu_duong,pioglitazone,PIOGLITAZONE HYDROCHLORIDE,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,15 mg uống 1 lần/ngày,Phù; tăng cân; đau đầu.,Suy tim độ III-IV; dị ứng pioglitazone.,Theo dõi phù và suy tim.
+tieu_duong,exenatide,EXENATIDE,Hỗ trợ kiểm soát đường huyết ở tiểu đường type 2.,5 mcg tiêm dưới da 2 lần/ngày,Buồn nôn; nôn; tiêu chảy.,Dị ứng exenatide; tiền sử viêm tụy nặng.,Thận trọng nguy cơ viêm tụy.
+tang_huyet_ap,amlodipine,AMLODIPINE BESYLATE,Giúp kiểm soát huyết áp.,5 mg uống 1 lần/ngày,Phù; chóng mặt; mệt mỏi.,Dị ứng amlodipine.,Theo dõi phù ngoại biên.
+tang_huyet_ap,bisoprolol,BISOPROLOL FUMARATE,Giúp kiểm soát huyết áp.,5 mg uống 1 lần/ngày,Mệt; chóng mặt; nhịp tim chậm.,Block nhĩ thất độ II-III; suy tim mất bù; dị ứng thuốc.,Thận trọng ở bệnh nhân nhịp chậm.
+tang_huyet_ap,losartan,LOSARTAN POTASSIUM,Giúp kiểm soát huyết áp.,50 mg uống 1 lần/ngày,Chóng mặt; mệt; đau lưng.,Dị ứng losartan; đang dùng aliskiren ở bệnh nhân đái tháo đường.,Theo dõi huyết áp và kali máu.
+tang_huyet_ap,enalapril,ENALAPRIL MALEATE,Giúp kiểm soát huyết áp.,2.5 mg uống 1 lần/ngày,Ho; chóng mặt; hạ huyết áp.,Tiền sử phù mạch; dị ứng ACEi; thai kỳ.,Thận trọng nguy cơ phù mạch.
+tang_huyet_ap,atenolol,ATENOLOL,Giúp kiểm soát huyết áp.,50 mg uống 1 lần/ngày,Mệt; chóng mặt; nhịp tim chậm.,Nhịp chậm xoang; block tim độ cao; suy tim mất bù.,Không ngừng đột ngột.
+cam_cum,oseltamivir,OSELTAMIVIR PHOSPHATE,Giảm triệu chứng cúm.,75 mg uống 2 lần/ngày trong 5 ngày,Buồn nôn; nôn; đau đầu.,Dị ứng oseltamivir.,Dùng sớm trong 48 giờ đầu.
+cam_cum,cetirizine,CETIRIZINE HYDROCHLORIDE,Giảm triệu chứng cúm.,10 mg uống 1 lần/ngày,Buồn ngủ; khô miệng; mệt.,Dị ứng cetirizine.,Thận trọng khi lái xe.
+cam_cum,pseudoephedrine,PSEUDOEPHEDRINE HYDROCHLORIDE,Giảm triệu chứng cúm.,60 mg uống mỗi 4-6 giờ,Tim đập nhanh; bồn chồn; mất ngủ.,Tăng huyết áp nặng; đang dùng MAOI.,Thận trọng ở người tăng huyết áp.
+viem_da_day,omeprazole,OMEPRAZOLE,Giảm tiết acid dạ dày.,20 mg uống 1 lần/ngày,Đau đầu; buồn nôn; đầy bụng.,Dị ứng omeprazole.,Không dùng kéo dài nếu không có chỉ định.
+viem_da_day,esomeprazole,ESOMEPRAZOLE MAGNESIUM,Giảm tiết acid dạ dày.,20 mg uống 1 lần/ngày,Đau đầu; buồn nôn; tiêu chảy.,Dị ứng esomeprazole.,Không dùng kéo dài nếu không có chỉ định.
+viem_da_day,famotidine,FAMOTIDINE,Giảm tiết acid dạ dày.,40 mg uống 1 lần/ngày,Đau đầu; chóng mặt; táo bón.,Dị ứng famotidine.,Thận trọng ở bệnh nhân suy thận.
+viem_da_day,pantoprazole,PANTOPRAZOLE SODIUM,Giảm tiết acid dạ dày.,40 mg uống 1 lần/ngày,Đau đầu; tiêu chảy; buồn nôn.,Dị ứng pantoprazole.,Không dùng kéo dài nếu không có chỉ định.
+viem_da_day,lansoprazole,LANSOPRAZOLE,Giảm tiết acid dạ dày.,15 mg uống 1 lần/ngày,Đau đầu; tiêu chảy; buồn nôn.,Dị ứng lansoprazole.,Thận trọng khi dùng dài ngày.
+viem_da_day,sucralfate,SUCRALFATE,Giảm tiết acid dạ dày.,1 g uống trước bữa ăn,Táo bón; khô miệng; buồn nôn.,Dị ứng sucralfate.,Thận trọng ở bệnh nhân suy thận.
