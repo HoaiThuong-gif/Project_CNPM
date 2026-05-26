@@ -1,0 +1,339 @@
+/* DashboardAdmin.css */
+
+body{
+    margin: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f4faff;
+
+    display: flex;
+
+    color: #1e293b;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width: 280px;
+
+    height: 100vh;
+
+    background: linear-gradient(
+        to bottom,
+        #7dd3fc,
+        #38bdf8,
+        #f9a8d4
+    );
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    padding: 30px 20px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.logo{
+    font-size: 30px;
+    font-weight: bold;
+
+    color: white;
+
+    margin-bottom: 50px;
+
+    text-align: center;
+}
+
+.sidebar-menu{
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.sidebar-menu a{
+    text-decoration: none;
+
+    color: white;
+
+    padding: 16px 20px;
+
+    border-radius: 16px;
+
+    transition: 0.3s;
+
+    font-weight: 600;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu .active{
+    background: rgba(255,255,255,0.25);
+
+    backdrop-filter: blur(10px);
+}
+
+/* MAIN */
+
+.main-content{
+    margin-left: 280px;
+
+    width: calc(100% - 280px);
+
+    padding: 40px;
+
+    box-sizing: border-box;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 40px;
+}
+
+.topbar h1{
+    margin: 0;
+
+    font-size: 38px;
+
+    color: #0f172a;
+}
+
+.topbar p{
+    color: #64748b;
+
+    margin-top: 10px;
+}
+
+.admin-box{
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    background: white;
+
+    padding: 12px 20px;
+
+    border-radius: 20px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.admin-box img{
+    width: 55px;
+    height: 55px;
+
+    border-radius: 50%;
+}
+
+.admin-box h3{
+    margin: 0;
+}
+
+.admin-box span{
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+/* STATS */
+
+.stats-grid{
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+
+    gap: 25px;
+
+    margin-bottom: 40px;
+}
+
+.card{
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 28px;
+
+    box-shadow: 0 15px 40px rgba(56,189,248,0.08);
+
+    transition: 0.3s;
+}
+
+.card:hover{
+    transform: translateY(-6px);
+}
+
+.card h2{
+    margin: 0;
+
+    font-size: 42px;
+
+    color: #0ea5e9;
+}
+
+.card p{
+    margin-top: 15px;
+
+    color: #64748b;
+
+    font-size: 17px;
+}
+
+/* TABLE */
+
+.table-section{
+    background: white;
+
+    border-radius: 30px;
+
+    padding: 30px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+}
+
+.section-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.section-header h2{
+    margin: 0;
+}
+
+.section-header button{
+    border: none;
+
+    background: #38bdf8;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.section-header button:hover{
+    background: #0ea5e9;
+}
+
+table{
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+thead{
+    background: #f0f9ff;
+}
+
+th,
+td{
+    padding: 18px;
+
+    text-align: left;
+}
+
+tbody tr{
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.success{
+    background: #dcfce7;
+
+    color: #16a34a;
+
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+}
+
+.pending{
+    background: #fef9c3;
+
+    color: #ca8a04;
+
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+    .sidebar{
+        width: 100px;
+    }
+
+    .sidebar .logo{
+        font-size: 18px;
+    }
+
+    .sidebar-menu a{
+        font-size: 13px;
+
+        padding: 12px;
+    }
+
+    .main-content{
+        margin-left: 100px;
+
+        width: calc(100% - 100px);
+    }
+
+    .topbar{
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 20px;
+    }
+}
+
+@media(max-width:700px){
+
+    body{
+        flex-direction: column;
+    }
+
+    .sidebar{
+        position: relative;
+
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content{
+        width: 100%;
+
+        margin-left: 0;
+
+        padding: 20px;
+    }
+
+    .table-section{
+        overflow-x: auto;
+    }
+}

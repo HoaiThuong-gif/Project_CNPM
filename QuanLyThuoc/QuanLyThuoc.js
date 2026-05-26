@@ -1,0 +1,1 @@
+console.log("Trang Quản Lý Thuốc Loaded");

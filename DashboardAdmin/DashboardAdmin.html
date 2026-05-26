@@ -1,0 +1,235 @@
+<!-- DashboardAdmin.html -->
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard Admin | Bệnh Viện Nhóm Bar</title>
+
+    <link
+        rel="stylesheet"
+        href="DashboardAdmin.css"
+    >
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🏥 Nhóm Bar
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a class="active" href="#">
+                📊 Dashboard
+            </a>
+
+            <a href="../QuanLyNguoiDung/QuanLyNguoiDung.html">
+                👤 Người Dùng
+            </a>
+
+            <a href="../QuanLyBenh/QuanLyBenh.html">
+                🦠 Bệnh
+            </a>
+
+            <a href="../QuanLyThuoc/QuanLyThuoc.html">
+                💊 Thuốc
+            </a>
+
+            <a href="../QuanLyTrieuChung/QuanLyTrieuChung.html">
+                🤒 Triệu Chứng
+            </a>
+
+            <a href="../ThongKe/ThongKe.html">
+                📈 Thống Kê
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Dashboard Admin
+                </h1>
+
+                <p>
+                    Quản lý hệ thống Bệnh Viện Nhóm Bar
+                </p>
+
+            </div>
+
+            <div class="admin-box">
+
+                <img
+                    src="https://i.pravatar.cc/100"
+                    alt=""
+                >
+
+                <div>
+
+                    <h3>Admin</h3>
+
+                    <span>Quản trị viên</span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- STATS -->
+
+        <section class="stats-grid">
+
+            <div class="card">
+
+                <h2>12.450</h2>
+
+                <p>Người dùng</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>5.280</h2>
+
+                <p>Lượt tra cứu</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>860</h2>
+
+                <p>Loại thuốc</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>98%</h2>
+
+                <p>Độ hài lòng</p>
+
+            </div>
+
+        </section>
+
+        <!-- TABLE -->
+
+        <section class="table-section">
+
+            <div class="section-header">
+
+                <h2>
+                    Hoạt động gần đây
+                </h2>
+
+                <button>
+                    Xem tất cả
+                </button>
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Người dùng</th>
+
+                        <th>Hoạt động</th>
+
+                        <th>Thời gian</th>
+
+                        <th>Trạng thái</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Nguyễn Văn A</td>
+
+                        <td>Tra cứu thuốc</td>
+
+                        <td>10 phút trước</td>
+
+                        <td>
+                            <span class="success">
+                                Thành công
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Trần Thị B</td>
+
+                        <td>Dự đoán bệnh</td>
+
+                        <td>25 phút trước</td>
+
+                        <td>
+                            <span class="success">
+                                Thành công
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Lê Minh C</td>
+
+                        <td>Đăng ký tài khoản</td>
+
+                        <td>1 giờ trước</td>
+
+                        <td>
+                            <span class="pending">
+                                Chờ xử lý
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+    <script src="DashboardAdmin.js"></script>
+
+</body>
+
+</html>

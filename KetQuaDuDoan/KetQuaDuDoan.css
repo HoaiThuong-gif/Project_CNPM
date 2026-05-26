@@ -1,0 +1,360 @@
+/* KetQuaDuDoan.css */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f6fbff;
+
+    color: #1e293b;
+}
+
+/* HEADER */
+
+.header{
+    width: 100%;
+    height: 80px;
+
+    background: rgba(255,255,255,0.9);
+
+    backdrop-filter: blur(12px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 80px;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 999;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logo{
+    font-size: 28px;
+    font-weight: bold;
+
+    color: #38bdf8;
+}
+
+.menu{
+    display: flex;
+    align-items: center;
+
+    gap: 30px;
+}
+
+.menu a{
+    text-decoration: none;
+
+    color: #334155;
+
+    font-weight: 600;
+
+    transition: 0.3s;
+}
+
+.menu a:hover{
+    color: #ec4899;
+}
+
+/* MAIN */
+
+.result-container{
+    width: 90%;
+
+    margin: auto;
+
+    min-height: calc(100vh - 80px);
+
+    display: flex;
+
+    gap: 50px;
+
+    padding: 60px 0;
+}
+
+/* LEFT */
+
+.left-panel{
+    flex: 1;
+}
+
+.tag{
+    background: #dbeafe;
+
+    color: #2563eb;
+
+    padding: 10px 22px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+.left-panel h1{
+    font-size: 62px;
+
+    margin: 30px 0 20px;
+
+    line-height: 1.2;
+}
+
+.left-panel p{
+    font-size: 20px;
+
+    line-height: 1.8;
+
+    color: #64748b;
+}
+
+.info-card{
+    margin-top: 35px;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 24px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.info-card h3{
+    margin-bottom: 20px;
+
+    color: #0ea5e9;
+}
+
+.info-card ul{
+    padding-left: 20px;
+
+    line-height: 2;
+}
+
+.pink{
+    background: linear-gradient(
+        135deg,
+        #ffe4f1,
+        #fff1f7
+    );
+}
+
+/* RIGHT */
+
+.right-panel{
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-card{
+    width: 100%;
+    max-width: 520px;
+
+    background: white;
+
+    padding: 45px;
+
+    border-radius: 35px;
+
+    box-shadow: 0 20px 60px rgba(56,189,248,0.15);
+}
+
+.result-top{
+    text-align: center;
+}
+
+.status{
+    background: #dcfce7;
+
+    color: #16a34a;
+
+    padding: 10px 20px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+.result-top h2{
+    font-size: 48px;
+
+    margin: 25px 0 15px;
+
+    color: #0f172a;
+}
+
+.result-top p{
+    color: #64748b;
+
+    line-height: 1.8;
+}
+
+.progress-box{
+    margin-top: 40px;
+}
+
+.progress-title{
+    margin-bottom: 15px;
+
+    font-weight: bold;
+
+    color: #334155;
+}
+
+.progress-bar{
+    width: 100%;
+    height: 18px;
+
+    background: #e2e8f0;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+.progress-fill{
+    width: 65%;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        #7dd3fc,
+        #ec4899
+    );
+
+    border-radius: 999px;
+}
+
+.progress-text{
+    display: block;
+
+    margin-top: 12px;
+
+    color: #64748b;
+}
+
+.medicine-box{
+    margin-top: 40px;
+}
+
+.medicine-box h3{
+    margin-bottom: 20px;
+
+    color: #0ea5e9;
+}
+
+.medicine-item{
+    background: #f0f9ff;
+
+    padding: 18px;
+
+    border-radius: 16px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #dbeafe;
+
+    transition: 0.3s;
+}
+
+.medicine-item:hover{
+    transform: translateY(-4px);
+}
+
+.btn-save{
+    width: 100%;
+    height: 60px;
+
+    border: none;
+
+    margin-top: 35px;
+
+    border-radius: 18px;
+
+    background: linear-gradient(
+        135deg,
+        #7dd3fc,
+        #ec4899
+    );
+
+    color: white;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.btn-save:hover{
+    transform: translateY(-5px);
+}
+
+/* FOOTER */
+
+.footer{
+    background: white;
+
+    padding: 60px 10%;
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+
+    gap: 40px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.footer-box h2,
+.footer-box h3{
+    margin-bottom: 20px;
+
+    color: #0ea5e9;
+}
+
+.footer-box p{
+    color: #64748b;
+
+    line-height: 1.8;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+
+    .result-container{
+        flex-direction: column;
+    }
+
+    .left-panel h1{
+        font-size: 42px;
+    }
+
+    .header{
+        padding: 0 20px;
+    }
+
+    .menu{
+        display: none;
+    }
+
+}

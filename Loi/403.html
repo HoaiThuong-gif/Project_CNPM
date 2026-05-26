@@ -1,0 +1,131 @@
+<!-- 403.html -->
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Không Có Quyền Truy Cập</title>
+
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+
+            min-height: 100vh;
+
+            background: linear-gradient(
+                135deg,
+                #f0f9ff,
+                #ffe4f1
+            );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 30px;
+        }
+
+        .error-box{
+            width: 100%;
+            max-width: 700px;
+
+            background: white;
+
+            padding: 60px;
+
+            border-radius: 35px;
+
+            text-align: center;
+
+            box-shadow: 0 20px 60px rgba(56,189,248,0.15);
+        }
+
+        .error-code{
+            font-size: 120px;
+            font-weight: bold;
+
+            color: #38bdf8;
+        }
+
+        h1{
+            font-size: 40px;
+
+            margin: 20px 0;
+
+            color: #0f172a;
+        }
+
+        p{
+            font-size: 18px;
+
+            line-height: 1.8;
+
+            color: #64748b;
+        }
+
+        .btn-home{
+            display: inline-block;
+
+            margin-top: 35px;
+
+            padding: 18px 40px;
+
+            border-radius: 18px;
+
+            text-decoration: none;
+
+            background: linear-gradient(
+                135deg,
+                #7dd3fc,
+                #ec4899
+            );
+
+            color: white;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+        .btn-home:hover{
+            transform: translateY(-5px);
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="error-box">
+
+        <div class="error-code">
+            403
+        </div>
+
+        <h1>
+            Không Có Quyền Truy Cập
+        </h1>
+
+        <p>
+            Bạn không có quyền truy cập vào trang này của Bệnh Viện Nhóm Bar.
+        </p>
+
+        <a 
+            href="../TrangChu/TrangChu.html"
+            class="btn-home"
+        >
+            Quay Về Trang Chủ
+        </a>
+
+    </div>
+
+</body>
+</html>

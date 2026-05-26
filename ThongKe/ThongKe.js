@@ -1,0 +1,1 @@
+console.log("Trang thống kê đã hoạt động!");
