@@ -1,7 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using Project_CNPM.Data;
+using Project_CNPM.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMedicineManagement, MedicineManagement>();
 
 var app = builder.Build();
 
