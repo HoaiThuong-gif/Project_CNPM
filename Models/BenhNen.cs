@@ -9,6 +9,8 @@ public partial class BenhNen
 
     public string TenBenhNen { get; set; } = null!;
 
+    public bool? DangHoatDong { get; set; }
+
     public virtual ICollection<CanhBaoBenhNenThuoc> CanhBaoBenhNenThuocs { get; set; } = new List<CanhBaoBenhNenThuoc>();
 
     public virtual ICollection<LichSuDuDoan> MaLichSus { get; set; } = new List<LichSuDuDoan>();

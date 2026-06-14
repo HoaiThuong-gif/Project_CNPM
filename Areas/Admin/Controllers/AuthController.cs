@@ -1,10 +1,8 @@
-using Projcet_CNPM.DTOs.Auth;
+using Project_CNPM.Area.Admin.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Project_CNPM.Data;
-using Project_CNPM.Services;
+using Project_CNPM.Area.Admin.Services;
 
-namespace Project_CNPM.Controllers
+namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -30,7 +28,6 @@ namespace Project_CNPM.Controllers
              if (!result.IsSuccess)
                 return BadRequest(new { message = result.Message });
             
-            
             return Ok(new { 
                 message = "Đăng nhập thành công!",
                 userId = result.User.MaNguoiDung,
@@ -53,6 +50,17 @@ namespace Project_CNPM.Controllers
                 return BadRequest(new { message = result.Message });
 
             return Ok(new { message = "Đăng ký thành công!" });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout(int userId)
+        {
+            var result = await _authService.LogoutAsync(userId);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = "Đăng xuất thành công!" });
         }
     }
 }

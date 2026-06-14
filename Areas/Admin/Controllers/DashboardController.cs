@@ -1,0 +1,26 @@
+using Microsoft.AspNetCore.Mvc;
+using Project_CNPM.Area.Admin.Services;
+
+namespace Project_CNPM.Area.Admin.Controllers
+{
+    [ApiController]
+    [Route("api/admin/[controller]")]
+    public class DashboardController : Controller
+    {   
+        private readonly IDashboardAdminService _dashboardAndmin;
+
+        public DashboardController(IDashboardAdminService dashboardAdminService)
+        {
+            _dashboardAndmin = dashboardAdminService;
+        }
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetStatistics()
+        {
+            var statistics = await _dashboardAndmin.GetSystemStatisticsAsync();
+            
+            return Ok(statistics);
+        }
+    }
+
+}

@@ -23,7 +23,11 @@ public partial class NguoiDung
 
     public bool? BiKhoa { get; set; }
 
+    public DateTime? DeleteAt { get; set; }
+
     public DateTime? NgayTao { get; set; }
+
+    public virtual ICollection<DanhGiaDuDoan> DanhGiaDuDoans { get; set; } = new List<DanhGiaDuDoan>();
 
     public virtual ICollection<LichSuDuDoan> LichSuDuDoans { get; set; } = new List<LichSuDuDoan>();
 }

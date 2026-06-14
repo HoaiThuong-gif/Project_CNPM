@@ -61,6 +61,10 @@ Là một người dùng, tôi muốn xem lại lịch sử tra cứu thuốc, �
 ## US-16: Xóa lịch sử tra cứu
 Là một người dùng, tôi muốn xóa lịch sử tra cứu, để chủ động quản lý dữ liệu cá nhân của mình.
 
+
+
+
+
 # 4. Nhóm user stories dành cho quản trị viên
 ## US-17: Đăng nhập trang quản trị
 Là một quản trị viên, tôi muốn đăng nhập vào trang quản trị, để có thể quản lý dữ liệu của hệ thống.

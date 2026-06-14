@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Project_CNPM.Data;
-using Project_CNPM.Services;
+using Project_CNPM.Area.Admin.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +13,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMedicineManagement, MedicineManagement>();
+builder.Services.AddScoped<IMedicineAdminService, MedicineAdminService>();
+builder.Services.AddScoped<IDiseaseAdminService, DiseaseAdminService>();
+builder.Services.AddScoped<ISymptomAdminService, SymptomAdminService>();
+builder.Services.AddScoped<IUserAdminService, UserAdminService>();
+builder.Services.AddScoped<ISafetyWarningAdminService, SafetyWarningAdminService>();
+builder.Services.AddScoped<IDashboardAdminService, DashboardAdminService>();
+
 
 var app = builder.Build();
 

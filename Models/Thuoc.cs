@@ -11,6 +11,10 @@ public partial class Thuoc
 
     public string? HoatChat { get; set; }
 
+    public string? NhomThuoc { get; set; }
+
+    public string? DangBaoChe { get; set; }
+
     public string? CongDung { get; set; }
 
     public string? LieuDung { get; set; }
@@ -21,9 +25,15 @@ public partial class Thuoc
 
     public string? LuuY { get; set; }
 
+    public bool CanKeDon { get; set; }
+
     public bool? DangHoatDong { get; set; }
 
     public DateTime? NgayTao { get; set; }
+
+    public DateTime? NgayCapNhat { get; set; }
+
+    public virtual ICollection<BenhThuoc> BenhThuocs { get; set; } = new List<BenhThuoc>();
 
     public virtual ICollection<CanhBaoBenhNenThuoc> CanhBaoBenhNenThuocs { get; set; } = new List<CanhBaoBenhNenThuoc>();
 
@@ -33,7 +43,9 @@ public partial class Thuoc
 
     public virtual ICollection<QuyTacGoiYthuoc> QuyTacGoiYthuocs { get; set; } = new List<QuyTacGoiYthuoc>();
 
-    public virtual ICollection<Benh> MaBenhs { get; set; } = new List<Benh>();
+    public virtual ICollection<TuongTacThuoc> TuongTacThuocMaThuoc1Navigations { get; set; } = new List<TuongTacThuoc>();
+
+    public virtual ICollection<TuongTacThuoc> TuongTacThuocMaThuoc2Navigations { get; set; } = new List<TuongTacThuoc>();
 
     public virtual ICollection<ThanhPhan> MaThanhPhans { get; set; } = new List<ThanhPhan>();
 }

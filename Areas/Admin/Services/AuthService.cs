@@ -1,8 +1,9 @@
 using Project_CNPM.Models;
 using Project_CNPM.Data;
-using Projcet_CNPM.DTOs.Auth;
+using Microsoft.EntityFrameworkCore;
+using Project_CNPM.Area.Admin.DTOs;
 
-namespace Project_CNPM.Services
+namespace Project_CNPM.Area.Admin.Services
 {
     public class AuthService : IAuthService
     {
@@ -14,7 +15,7 @@ namespace Project_CNPM.Services
         }
         public async Task<(bool IsSuccess, string Message, NguoiDung? User)> LoginAsync(loginDto request)
         {
-            var user = _context.NguoiDungs.FirstOrDefault(u => u.Email == request.email);
+            var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.Email == request.email);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.password, user.MatKhauMaHoa))
                 return (false, "User not found", (NguoiDung?)null);
@@ -24,7 +25,7 @@ namespace Project_CNPM.Services
 
         public async Task<(bool IsSuccess, string Message)> RegisterAsync(registerDto request)
         {
-            var existingUser = _context.NguoiDungs.FirstOrDefault(u => u.Email == request.email);
+            var existingUser = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.Email == request.email);
 
             if (existingUser != null) return (false, "Email already exists");
 
@@ -38,6 +39,11 @@ namespace Project_CNPM.Services
             _context.NguoiDungs.Add(newUser);
             await _context.SaveChangesAsync();
             return (true, "Registration successful");
+        }
+
+        public async Task<(bool IsSuccess, string Message)> LogoutAsync(int userId)
+        {
+            return (true, "Logout successful");
         }
     }
 }

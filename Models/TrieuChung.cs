@@ -11,6 +11,8 @@ public partial class TrieuChung
 
     public string? MoTa { get; set; }
 
+    public bool? DangHoatDong { get; set; }
+
     public DateTime? NgayTao { get; set; }
 
     public virtual ICollection<BenhTrieuChung> BenhTrieuChungs { get; set; } = new List<BenhTrieuChung>();

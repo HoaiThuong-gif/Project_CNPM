@@ -17,6 +17,12 @@ public partial class KetQuaDuDoan
 
     public string? CanhBao { get; set; }
 
+    public string? TenThuocSnapshot { get; set; }
+
+    public string? LieuDungSnapshot { get; set; }
+
+    public virtual ICollection<DanhGiaDuDoan> DanhGiaDuDoans { get; set; } = new List<DanhGiaDuDoan>();
+
     public virtual LichSuDuDoan? MaLichSuNavigation { get; set; }
 
     public virtual Thuoc? MaThuocNavigation { get; set; }
