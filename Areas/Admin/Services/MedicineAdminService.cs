@@ -2,16 +2,21 @@ using Microsoft.EntityFrameworkCore;
 using Project_CNPM.Area.Admin.DTOs;
 using Project_CNPM.Data;
 using Project_CNPM.Models;
+using System.Text;
+using System.Text.Json;
 
 namespace Project_CNPM.Area.Admin.Services
 {
     public class MedicineAdminService : IMedicineAdminService
     {
         private readonly ApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
 
-        public MedicineAdminService(ApplicationDbContext context)
+        public MedicineAdminService(ApplicationDbContext context, HttpClient httpClient)
         {
             _context = context;
+            _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri("http://localhost:5000"); 
         }
 
         public async Task<IEnumerable<MedicineDetailDto>> GetAllMedicinesAsync(bool includeInactive = true)
@@ -87,7 +92,8 @@ namespace Project_CNPM.Area.Admin.Services
             };
 
             _context.Thuocs.Add(thuoc);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
+
             return (true, "Add medicine success!");
         }
 
@@ -114,6 +120,7 @@ namespace Project_CNPM.Area.Admin.Services
             thuoc.NgayCapNhat = DateTime.Now;
 
             await _context.SaveChangesAsync();
+
             return (true, "Update medicine success!");
         }
 
@@ -128,5 +135,6 @@ namespace Project_CNPM.Area.Admin.Services
             await _context.SaveChangesAsync();
             return (true, isActive ? "Turn on medicine success!" : "Turn off medicine success!");
         }
+
     }
 }

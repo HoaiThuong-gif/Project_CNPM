@@ -13,16 +13,10 @@ namespace Project_CNPM.Area.Admin.Services{
             _context = context;
         }
 
-        public async Task<IEnumerable<UserAdminViewDto>> GetAllUsersAsync(bool includeDeleted = false)
+        public async Task<IEnumerable<UserAdminViewDto>> GetAllUsersAsync() // Xóa tham số
         {
-            var query = _context.NguoiDungs.AsQueryable();
-
-            if (!includeDeleted)
-            {
-                query = query.Where(u => u.DeleteAt == null);
-            }
-
-            return await query.Select(u => new UserAdminViewDto
+            // Bỏ đoạn if(!includeDeleted)
+            return await _context.NguoiDungs.Select(u => new UserAdminViewDto
             {
                 UserId = u.MaNguoiDung,
                 FullName = u.HoTen,

@@ -18,7 +18,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         [HttpGet("allergies")]
         public async Task<IActionResult> GetAllAllergies()
         {
-            var allergies = await _safetyWarningAdminService.GetAllAllergiesAsync(true);
+            var allergies = await _safetyWarningAdminService.GetAllAllergiesAsync();
             return Ok(allergies);
         }
 
@@ -58,7 +58,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         [HttpGet("background-diseases")]
         public async Task<IActionResult> GetAllBackgroundDiseases()
         {
-            var backgroundDiseases = await _safetyWarningAdminService.GetAllBackgroundDiseasesAsync(true);
+            var backgroundDiseases = await _safetyWarningAdminService.GetAllBackgroundDiseasesAsync();
             return Ok(backgroundDiseases);
         }
 

@@ -15,9 +15,9 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers(bool includeDeleted = false)
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userAdminService.GetAllUsersAsync(includeDeleted);
+            var users = await _userAdminService.GetAllUsersAsync();
             return Ok(users);
         }
 

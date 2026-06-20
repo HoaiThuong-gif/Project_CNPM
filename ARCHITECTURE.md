@@ -1,14 +1,16 @@
 # Kiến trúc dự án Project_CNPM
 
-Cập nhật: 14/06/2026
+Cập nhật: 20/06/2026
 
-Tài liệu này mô tả trạng thái hiện tại của mã nguồn để các thành viên khác nhanh chóng nắm được ứng dụng đang tổ chức ra sao, phần admin đã làm đến đâu và nên đọc file nào khi tiếp tục phát triển.
+Tài liệu này mô tả trạng thái hiện tại của mã nguồn để các thành viên nhanh chóng nắm được ứng dụng đang tổ chức ra sao, phần admin đã làm đến đâu, lớp gợi ý thuốc bằng AI đang nằm ở đâu và nên đọc file nào khi tiếp tục phát triển.
 
 ## 1. Tổng quan
 
-`Project_CNPM` là ứng dụng ASP.NET Core 8, dùng MVC kết hợp API controller. Dữ liệu được truy cập qua Entity Framework Core và SQL Server database `WebsiteDuDoanThuoc`.
+`Project_CNPM` là ứng dụng ASP.NET Core 8 theo mô hình MVC kết hợp API controller. Dữ liệu nghiệp vụ được truy cập bằng Entity Framework Core và SQL Server database `WebsiteDuDoAnThuoc`/`WebsiteDuDoanThuoc` tùy cấu hình môi trường.
 
-Luồng xử lý chính:
+Ngoài backend C#, dự án hiện có thêm một service Python Flask trong thư mục `src/` để tạo embedding thuốc và gợi ý thuốc bằng vector search. Service này dùng model `intfloat/multilingual-e5-small`, lưu vector vào `drugs_vector.npy` và metadata vào `drug_metadata.json`.
+
+Luồng xử lý chính của phần ASP.NET Core:
 
 1. Client gửi request tới controller.
 2. Controller nhận DTO hoặc query parameter, kiểm tra cơ bản và gọi service.
@@ -16,7 +18,13 @@ Luồng xử lý chính:
 4. `ApplicationDbContext` ánh xạ bảng SQL Server sang entity trong `Models`.
 5. Controller trả JSON cho API hoặc Razor view cho MVC.
 
-Hiện các nghiệp vụ admin chính đã có controller và service: xác thực, dashboard, bệnh, triệu chứng, thuốc, cảnh báo an toàn và người dùng.
+Luồng xử lý AI hiện có:
+
+1. API admin liên kết thuốc với bệnh qua `MedicineDiseaseMappingService`.
+2. Service lưu mapping vào bảng `BenhThuoc`.
+3. Service gọi Flask API `POST /embed-drug` để đồng bộ vector thuốc.
+4. Flask service lưu/cập nhật vector trong local vector store.
+5. Khi cần gợi ý, Flask API `POST /predict` mã hóa bệnh + triệu chứng và trả danh sách thuốc phù hợp theo điểm tổng hợp.
 
 ## 2. Cấu trúc thư mục hiện tại
 
@@ -40,23 +48,30 @@ Project_CNPM/
 |       |   +-- SafetyWarningDto.cs
 |       |   +-- SymptomDto.cs
 |       |   +-- UserAdminDto.cs
+|       |   +-- medicineDiseaseDto.cs
 |       +-- Services/
 |           +-- AuthService.cs
 |           +-- DashboardService.cs
 |           +-- DiseaseAdminService.cs
+|           +-- MedicineAdminService.cs
+|           +-- MedicineDiseaseMappingService.cs
+|           +-- SafetyAdminService.cs
+|           +-- SymptomService.cs
+|           +-- UserAdminService.cs
 |           +-- IAuthService.cs
 |           +-- IDashboardService.cs
 |           +-- IDiseaseAdminService.cs
 |           +-- IMedicineAdminService.cs
+|           +-- IMedicineDiseaseMappingService.cs
 |           +-- ISafetyAdminService.cs
 |           +-- ISymptomServeice.cs
 |           +-- IUserAdminService.cs
-|           +-- MedicineAdminService.cs
-|           +-- SafetyAdminService.cs
-|           +-- SymptomService.cs
-|           +-- UserAdminService.cs
++-- Controllers/
+|   +-- HomeController.cs
 +-- Data/
 |   +-- ApplicationDbContext.cs
+|   +-- benh_trieu_chung.csv
+|   +-- thuoc.csv
 +-- Models/
 |   +-- Benh.cs
 |   +-- BenhNen.cs
@@ -78,16 +93,45 @@ Project_CNPM/
 +-- Views/
 +-- wwwroot/
 +-- docs/
++-- src/
+|   +-- app.py
+|   +-- predict.py
+|   +-- seed_from_csv.py
+|   +-- vector_store.py
++-- appsettings.json
++-- appsettings.Development.json
++-- docker-compose.yml
 +-- Program.cs
 +-- Project_CNPM.csproj
 +-- SQL.sql
++-- drugs_vector.npy
++-- drug_metadata.json
 ```
 
-Ghi chú: Git status hiện vẫn còn một số file cũ ở root `Controllers/`, `DTOs/`, `Services/` bị đánh dấu xóa. Hướng phát triển hiện tại là dùng cấu trúc mới trong `Areas/Admin`.
+## 3. Công nghệ và thư viện
 
-## 3. Program.cs và Dependency Injection
+Phần C#:
 
-`Program.cs` đang đăng ký:
+- ASP.NET Core MVC/API trên `.NET 8`.
+- Entity Framework Core 8 với SQL Server.
+- `BCrypt.Net-Next` để hash và verify mật khẩu.
+- `HttpClient` để gọi service AI nội bộ ở `http://localhost:5000`.
+
+Phần Python:
+
+- Flask cho API AI.
+- `sentence-transformers` với model `intfloat/multilingual-e5-small`.
+- NumPy để lưu và tính similarity vector.
+- `requests` và `pyodbc` trong script seed dữ liệu.
+
+Hạ tầng local:
+
+- `docker-compose.yml` khởi tạo SQL Server 2019, expose port `1433`.
+- `SQL.sql` chứa schema/dữ liệu khởi tạo.
+
+## 4. Program.cs và Dependency Injection
+
+`Program.cs` hiện đăng ký:
 
 - `ApplicationDbContext` với SQL Server connection string `DefaultConnection`.
 - `IAuthService -> AuthService`
@@ -97,10 +141,11 @@ Ghi chú: Git status hiện vẫn còn một số file cũ ở root `Controllers
 - `IUserAdminService -> UserAdminService`
 - `ISafetyWarningAdminService -> SafetyWarningAdminService`
 - `IDashboardAdminService -> DashboardAdminService`
+- `IMedicineDiseaseMappingService -> MedicineDiseaseMappingService` qua `AddHttpClient`
 
-Ứng dụng dùng `AddControllersWithViews`, `UseHttpsRedirection`, `UseStaticFiles`, `UseRouting` và `UseAuthorization`.
+Pipeline hiện dùng `AddControllersWithViews`, `UseHttpsRedirection`, `UseStaticFiles`, `UseRouting`, `UseAuthorization` và route MVC mặc định `{controller=Home}/{action=Index}/{id?}`.
 
-## 4. Controller hiện có
+## 5. Controller hiện có
 
 Tất cả controller admin nằm trong namespace `Project_CNPM.Area.Admin.Controllers`.
 
@@ -112,7 +157,7 @@ Route base: `api/Auth`
 - `POST /api/Auth/register`
 - `POST /api/Auth/logout`
 
-Gọi `IAuthService` để đăng nhập, đăng ký và logout. Message tiếng Việt trong file hiện đang bị lỗi encoding, cần chuẩn hóa UTF-8 sau.
+Gọi `IAuthService` để đăng nhập, đăng ký và logout. Login kiểm tra email, mật khẩu đã hash và trạng thái khóa tài khoản.
 
 ### DashboardController
 
@@ -144,7 +189,7 @@ Route base: `api/Symptom`
 - `PATCH /api/Symptom/update`
 - `PATCH /api/Symptom/delete?id={id}`
 
-Gọi `ISymptomAdminService`. Lưu ý method trong interface đang tên `SolfDeleteAsync`, nên sau này nên đổi thành `SoftDeleteAsync` cho đúng chính tả.
+Gọi `ISymptomAdminService`. Interface và file hiện còn typo `ISymptomServeice.cs`, method soft delete hiện tên `SolfDeleteAsync`.
 
 ### MedicineController
 
@@ -156,7 +201,7 @@ Route base: `api/Medicine`
 - `PATCH /api/Medicine/update`
 - `PATCH /api/Medicine/status?id={id}&isActive={true|false}`
 
-Gọi `IMedicineAdminService`. Service hiện đã được chỉnh để trả `(IsSuccess, Message)` giống mẫu Disease.
+Gọi `IMedicineAdminService`. Controller hiện quản lý CRUD/trạng thái thuốc, chưa expose trực tiếp endpoint liên kết thuốc-bệnh.
 
 ### SafetyWarningController
 
@@ -194,11 +239,19 @@ Route base: `api/User`
 
 Gọi `IUserAdminService`. Hỗ trợ lấy danh sách user, khóa/mở khóa tài khoản và xóa mềm bằng `DeleteAt`.
 
-## 5. Service hiện có
+### HomeController
+
+Controller MVC mặc định cho Razor view:
+
+- `GET /Home/Index`
+- `GET /Home/Privacy`
+- `GET /Home/Error`
+
+## 6. Service hiện có
 
 ### AuthService
 
-Xử lý đăng nhập, đăng ký, hash mật khẩu bằng `BCrypt.Net`. Khi login, service tìm user theo email và verify password hash.
+Xử lý đăng nhập, đăng ký, logout. Mật khẩu được hash bằng `BCrypt.Net`; khi login, service tìm user theo email và verify password hash.
 
 ### DashboardAdminService
 
@@ -229,19 +282,30 @@ Quản trị triệu chứng:
 - Cập nhật.
 - Tắt trạng thái hoạt động.
 
-Ghi chú kỹ thuật: `SolfDeleteAsync` hiện thiếu `SaveChangesAsync`, cần bổ sung ở lượt dọn lỗi tiếp theo.
+Ghi chú kỹ thuật: `SolfDeleteAsync` hiện cần được đổi tên thành `SoftDeleteAsync` để đồng bộ chính tả.
 
 ### MedicineAdminService
 
 Quản trị thuốc:
 
-- Lấy danh sách, có tùy chọn lọc thuốc đang hoạt động.
+- Lấy danh sách thuốc, có tùy chọn lọc thuốc đang hoạt động.
 - Lấy chi tiết theo id.
 - Tạo thuốc, kiểm tra trùng tên.
 - Cập nhật thuốc và `NgayCapNhat`.
 - Bật/tắt trạng thái thuốc.
 
-Các field nullable từ entity `Thuoc` được map về chuỗi rỗng trong DTO để giảm warning/null khi trả API.
+Service hiện có inject `HttpClient` và đặt `BaseAddress = http://localhost:5000`, nhưng các luồng create/update/status chưa gọi Flask trực tiếp. Phần đồng bộ AI đang nằm ở `MedicineDiseaseMappingService`.
+
+### MedicineDiseaseMappingService
+
+Quản lý mapping thuốc-bệnh trong bảng `BenhThuoc`:
+
+- `LinkMedicineWithDiseaseAsync`: kiểm tra thuốc/bệnh tồn tại, tránh trùng mapping, thêm record `BenhThuoc`, sau đó gọi Flask `POST /embed-drug`.
+- `UnlinkMedicineFromDiseaseAsync`: xóa mapping, gọi Flask `POST /remove-drug`, rồi sync lại các mapping còn lại của thuốc.
+- `GetDiseasesOfMedicineAsync`: lấy danh sách bệnh đã gắn với một thuốc.
+- `GetMedicinesOfDiseaseAsync`: lấy danh sách thuốc đã gắn với một bệnh.
+
+Trạng thái hiện tại: service và DTO đã có, đã đăng ký DI qua `AddHttpClient`, nhưng chưa có controller endpoint tương ứng trong `Areas/Admin/Controllers`.
 
 ### SafetyWarningAdminService
 
@@ -251,7 +315,7 @@ Quản trị dữ liệu an toàn:
 - Bệnh nền: lấy danh sách, tạo, cập nhật, bật/tắt trạng thái.
 - Tương tác thuốc: lấy danh sách, tạo, xóa.
 
-Phần tương tác thuốc đã đổi sang dùng navigation property `MaThuoc1Navigation` và `MaThuoc2Navigation` để lấy tên thuốc, tránh truy vấn `FirstOrDefault(...).TenThuoc` có nguy cơ null.
+Phần tương tác thuốc dùng navigation property `MaThuoc1Navigation` và `MaThuoc2Navigation` để lấy tên thuốc.
 
 ### UserAdminService
 
@@ -261,9 +325,7 @@ Quản trị người dùng:
 - Khóa/mở khóa user bằng `BiKhoa`.
 - Xóa mềm user bằng `DeleteAt` và khóa luôn tài khoản.
 
-Ghi chú: `UserAdminDto.cs` hiện đang ở thư mục `Areas/Admin/DTOs` nhưng namespace là `Project_CNPM.DTOs.Medicine`. Service/interface đang import namespace này để build được; nên đổi namespace về `Project_CNPM.Area.Admin.DTOs` khi có thời gian dọn đồng bộ.
-
-## 6. DTO chính
+## 7. DTO chính
 
 - `AuthDto.cs`: `loginDto`, `registerDto`.
 - `DashboardDto.cs`: `SystemStatisticsDto`.
@@ -272,10 +334,11 @@ Ghi chú: `UserAdminDto.cs` hiện đang ở thư mục `Areas/Admin/DTOs` nhưn
 - `SafetyWarningDto.cs`: `AllergyCreateUpdateDto`, `BackgroundDiseaseCreateUpdateDto`, `DrugInteractionCreateDto`, `DrugInteractionDetailDto`.
 - `SymptomDto.cs`: `SymptomCreateUpdateDto`, `SymptomDetailDto`.
 - `UserAdminDto.cs`: `UserAdminViewDto`.
+- `medicineDiseaseDto.cs`: `DiseaseLinkedWithMedicineDto`, `MedicineLinkedWithDiseaseDto`.
 
-## 7. Data và Models
+## 8. Data và Models
 
-`Data/ApplicationDbContext.cs` là DbContext chính đang được đăng ký trong `Program.cs`.
+`Data/ApplicationDbContext.cs` là DbContext chính được đăng ký trong `Program.cs`. File này vẫn còn connection string scaffold trong `OnConfiguring`, dù ứng dụng cũng đã đọc `DefaultConnection` từ cấu hình.
 
 Các nhóm entity quan trọng:
 
@@ -285,7 +348,54 @@ Các nhóm entity quan trọng:
 - Cảnh báo an toàn: `DiUng`, `BenhNen`, `CanhBaoDiUngThuoc`, `CanhBaoBenhNenThuoc`, `TuongTacThuoc`.
 - Lịch sử dự đoán: `LichSuDuDoan`, `ChiTietTrieuChung`, `KetQuaDuDoan`, `DanhGiaDuDoan`.
 
-## 8. Trạng thái build
+## 9. Service AI Python
+
+### Flask API trong `src/app.py`
+
+- `POST /embed-drug`: nhận thông tin thuốc, tạo embedding và upsert vào vector store.
+- `POST /remove-drug`: xóa vector thuốc theo `ma_thuoc`.
+- `POST /predict`: nhận `ten_benh`, `trieu_chung`, `ma_benh`, `top_k`, trả danh sách thuốc gợi ý.
+- `GET /health`: kiểm tra service còn sống và số thuốc trong vector store.
+
+### Logic gợi ý trong `src/predict.py`
+
+`DrugRecommender` dùng:
+
+- `MODEL_NAME = intfloat/multilingual-e5-small`
+- `W_SIMILARITY = 0.6`
+- `W_DO_UU_TIEN = 0.3`
+- `W_TRONG_SO_TRIEU_CHUNG = 0.1`
+
+Điểm cuối cùng kết hợp similarity, độ ưu tiên điều trị và bonus cùng bệnh. Thuốc cần kê đơn (`can_ke_don != 0`) đang bị loại khỏi kết quả gợi ý.
+
+### Vector store trong `src/vector_store.py`
+
+`VectorStore` lưu:
+
+- Vector: `drugs_vector.npy`
+- Metadata: `drug_metadata.json`
+
+Các thao tác chính: load, save, upsert, delete, search theo dot product similarity.
+
+### Seed dữ liệu trong `src/seed_from_csv.py`
+
+Script đọc `Data/thuoc.csv`, tra `MaBenh` và `MaThuoc` thật từ SQL Server bằng `pyodbc`, rồi gọi `POST /embed-drug` để tạo vector ban đầu.
+
+## 10. Tài liệu nghiệp vụ
+
+Thư mục `docs/` hiện có:
+
+- `business_analysis.md`
+- `project_scope.md`
+- `functional_requirements.md`
+- `non_functional_requirements.md`
+- `user_stories.md`
+- `acceptance_criteria.md`
+- `user_survey.md`
+
+Các file này nên được dùng làm nguồn tham chiếu nghiệp vụ khi thêm tính năng mới hoặc kiểm tra tiêu chí nghiệm thu.
+
+## 11. Trạng thái build và kiểm chứng
 
 Lệnh đã kiểm tra:
 
@@ -293,30 +403,31 @@ Lệnh đã kiểm tra:
 dotnet build
 ```
 
-Kết quả hiện tại: build thành công, 0 error.
+Kết quả ngày 20/06/2026: build chưa thành công.
 
-Các warning còn tồn tại:
+Warning đáng chú ý:
 
-- Connection string vẫn xuất hiện trong `ApplicationDbContext.cs`.
-- Một số nullable warning ở `AuthController`, `UserAdminService`, `SymptomService`, `DiseaseAdminService`.
+- Một số file có tiếng Việt bị mojibake do encoding cũ, đặc biệt trong message/comment C# và Python.
+- `MedicineAdminService` inject `HttpClient` nhưng chưa dùng trong create/update/status.
+- Một số nullable warning ở `AuthController`, `UserAdminService`, `DiseaseAdminService`, `SymptomService`.
 - `AuthService.LogoutAsync` là async method nhưng chưa có `await`.
-- Một số message/comment tiếng Việt trong code bị lỗi encoding.
+- Chưa thấy test tự động trong repo.
 
-## 9. Việc nên làm tiếp
-
+## 12. Việc nên làm tiếp
 - Chuẩn hóa route style: hiện đa số controller dùng `api/[Controller]`, riêng `DashboardController` dùng `api/admin/[controller]`.
-- Sửa lỗi chính tả `ISymptomServeice.cs` và `SolfDeleteAsync`.
-- Bổ sung `SaveChangesAsync` trong `SymptomAdminService.SolfDeleteAsync`.
-- Đổi namespace `UserAdminDto.cs` về `Project_CNPM.Area.Admin.DTOs` và cập nhật import tương ứng.
+- Sửa chính tả `ISymptomServeice.cs` và `SolfDeleteAsync`.
 - Chuẩn hóa UTF-8 cho các file đang bị mojibake tiếng Việt.
-- Cân nhắc chuyển các route lấy id từ `GET /id?id=...` sang dạng rõ hơn như `GET /{id}`.
-- Di chuyển connection string nhạy cảm khỏi DbContext scaffold, dùng `appsettings`, environment variable hoặc secret store.
+- Di chuyển connection string nhạy cảm khỏi `ApplicationDbContext.OnConfiguring`, chỉ dùng `appsettings`, environment variable hoặc secret store.
+- Cân nhắc đổi route lấy id từ `GET /id?id=...` sang `GET /{id}`.
+- Bổ sung test cho service quan trọng: auth, medicine, disease, symptom, safety warning và mapping thuốc-bệnh.
+- Bổ sung health/check hoặc config rõ ràng cho Flask service để backend C# không phụ thuộc hard-code `http://localhost:5000`.
 
-## 10. Hướng đọc mã cho dev mới
+## 13. Hướng đọc mã cho dev mới
 
 1. Đọc `Program.cs` để hiểu DI, middleware và route nền.
 2. Đọc `Data/ApplicationDbContext.cs` để hiểu schema và quan hệ database.
-3. Đọc entity trong `Models`, tập trung vào `NguoiDung`, `Benh`, `TrieuChung`, `Thuoc`, `DiUng`, `BenhNen`, `TuongTacThuoc`.
+3. Đọc entity trong `Models`, tập trung vào `NguoiDung`, `Benh`, `TrieuChung`, `Thuoc`, `BenhThuoc`, `DiUng`, `BenhNen`, `TuongTacThuoc`.
 4. Đọc DTO trong `Areas/Admin/DTOs` để hiểu dữ liệu vào/ra.
 5. Đọc service trong `Areas/Admin/Services` để nắm logic nghiệp vụ.
 6. Đọc controller trong `Areas/Admin/Controllers` để biết endpoint client đang gọi.
+7. Đọc `src/app.py`, `src/predict.py`, `src/vector_store.py` nếu làm phần AI/gợi ý thuốc.

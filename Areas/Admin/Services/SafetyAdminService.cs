@@ -14,12 +14,10 @@ namespace Project_CNPM.Area.Admin.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<AllergyCreateUpdateDto>> GetAllAllergiesAsync(bool includeInactive = true)
+        public async Task<IEnumerable<AllergyCreateUpdateDto>> GetAllAllergiesAsync()
         {
-            var query = _context.DiUngs.AsQueryable();
-            if (!includeInactive) query = query.Where(x => x.DangHoatDong == true);
-
-            return await query.Select(x => new AllergyCreateUpdateDto
+            // Bỏ dòng if (!includeInactive)
+            return await _context.DiUngs.Select(x => new AllergyCreateUpdateDto
             {
                 AllergyId = x.MaDiUng,
                 AllergyName = x.TenDiUng,
@@ -71,12 +69,9 @@ namespace Project_CNPM.Area.Admin.Services
             return (true, isActive ? "Turn on allergy success!" : "Turn off allergy success!");
         }
 
-        public async Task<IEnumerable<BackgroundDiseaseCreateUpdateDto>> GetAllBackgroundDiseasesAsync(bool includeInactive = true)
+        public async Task<IEnumerable<BackgroundDiseaseCreateUpdateDto>> GetAllBackgroundDiseasesAsync() 
         {
-            var query = _context.BenhNens.AsQueryable();
-            if (!includeInactive) query = query.Where(x => x.DangHoatDong == true);
-
-            return await query.Select(x => new BackgroundDiseaseCreateUpdateDto
+             return await _context.BenhNens.Select(x => new BackgroundDiseaseCreateUpdateDto
             {
                 BackgroundDiseaseId = x.MaBenhNen,
                 DiseaseName = x.TenBenhNen,

@@ -19,7 +19,7 @@ builder.Services.AddScoped<ISymptomAdminService, SymptomAdminService>();
 builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 builder.Services.AddScoped<ISafetyWarningAdminService, SafetyWarningAdminService>();
 builder.Services.AddScoped<IDashboardAdminService, DashboardAdminService>();
-
+builder.Services.AddHttpClient<IMedicineDiseaseMappingService, MedicineDiseaseMappingService>();
 
 var app = builder.Build();
 

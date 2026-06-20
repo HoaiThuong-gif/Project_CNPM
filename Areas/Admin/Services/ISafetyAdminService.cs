@@ -4,12 +4,12 @@ namespace Project_CNPM.Area.Admin.Services
 {
     public interface ISafetyWarningAdminService
     {
-        Task<IEnumerable<AllergyCreateUpdateDto>> GetAllAllergiesAsync(bool includeInactive = true);
+        Task<IEnumerable<AllergyCreateUpdateDto>> GetAllAllergiesAsync();
         Task<(bool IsSuccess, string Message)> CreateAllergyAsync(AllergyCreateUpdateDto dto);
         Task<(bool IsSuccess, string Message)> UpdateAllergyAsync(AllergyCreateUpdateDto dto);
         Task<(bool IsSuccess, string Message)> ToggleAllergyStatusAsync(int id, bool isActive);
 
-        Task<IEnumerable<BackgroundDiseaseCreateUpdateDto>> GetAllBackgroundDiseasesAsync(bool includeInactive = true);
+        Task<IEnumerable<BackgroundDiseaseCreateUpdateDto>> GetAllBackgroundDiseasesAsync();
         Task<(bool IsSuccess, string Message)> CreateBackgroundDiseaseAsync(BackgroundDiseaseCreateUpdateDto dto);
         Task<(bool IsSuccess, string Message)> UpdateBackgroundDiseaseAsync(BackgroundDiseaseCreateUpdateDto dto);
         Task<(bool IsSuccess, string Message)> ToggleBackgroundDiseaseStatusAsync(int id, bool isActive);

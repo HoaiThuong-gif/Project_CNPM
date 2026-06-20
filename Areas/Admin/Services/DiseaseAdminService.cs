@@ -14,13 +14,13 @@ namespace Project_CNPM.Area.Admin.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<DiseaseDetailDto>> GetAllDiseasesAsync(bool includeDeleted)
+        public async Task<IEnumerable<DiseaseDetailDto>> GetAllDiseasesAsync(bool includeDeleted = false)
         {
             var query = _context.Benhs.AsQueryable();
 
             if (!includeDeleted)
             {
-                query = query.Where(b => b.DangHoatDong == false);
+                query = query.Where(b => b.DeleteAt == null); 
             }
 
             return await query.Select(b => new DiseaseDetailDto
@@ -56,15 +56,18 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<(bool IsSuccess, string Message)> CreateDiseaseAsync(DiseaseCreateDto dto)
         {
-            var existDisease = await _context.Benhs.FirstOrDefaultAsync(d => d.TenBenh == dto.DiseaseName);
+            if (string.IsNullOrWhiteSpace(dto.DiseaseName))
+                return (false, "Disease name cannot be empty");
+
+            var existDisease = await _context.Benhs.FirstOrDefaultAsync(d => d.TenBenh.ToLower() == dto.DiseaseName.Trim().ToLower());
 
             if (existDisease != null)
                 return (false, "Disease already exists");
 
             var benh = new Benh
             {
-                TenBenh = dto.DiseaseName,
-                MoTa = dto.Description,
+                TenBenh = dto.DiseaseName.Trim(),
+                MoTa = dto.Description?.Trim(),
                 NhomBenh = dto.DiseaseGroup,
                 MucDoNghiemTrong = dto.SeverityLevel,
                 DangHoatDong = true,
@@ -78,17 +81,24 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<(bool IsSuccess, string Message)> UpdateDiseaseAsync(DiseaseUpdateDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.DiseaseName))
+                return (false, "Disease name cannot be empty");
+
             var benh = await _context.Benhs.FindAsync(dto.DiseaseId);
             if (benh == null) return (false, "Not found disease");
 
-            benh.TenBenh = dto.DiseaseName;
-            benh.MoTa = dto.Description;
+            var exists = await _context.Benhs.AnyAsync(b => b.MaBenh != dto.DiseaseId && b.TenBenh.ToLower() == dto.DiseaseName.Trim().ToLower());
+            if (exists)
+                return (false, "Disease name already exists");
+
+            benh.TenBenh = dto.DiseaseName.Trim();
+            benh.MoTa = dto.Description?.Trim();
             benh.NhomBenh = dto.DiseaseGroup;
             benh.MucDoNghiemTrong = dto.SeverityLevel;
             benh.NgayCapNhat = DateTime.Now;
 
             await _context.SaveChangesAsync();
-            return (true, "Updatate success!");
+            return (true, "Update success!");
         }
 
         public async Task<(bool IsSuccess, string Message)> SoftDeleteDiseaseAsync(int id)

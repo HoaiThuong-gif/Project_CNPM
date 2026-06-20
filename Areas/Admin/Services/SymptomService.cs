@@ -46,33 +46,42 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<(bool IsSuccess, string Message)> CreateSymptomAsync(SymptomCreateUpdateDto dto)
         {
-            var existSymptom = await _context.TrieuChungs.FirstOrDefaultAsync(s => s.TenTrieuChung == dto.SymptomName);
+            if (string.IsNullOrWhiteSpace(dto.SymptomName))
+                return (false, "Symptom name cannot be empty");
+
+            var existSymptom = await _context.TrieuChungs.FirstOrDefaultAsync(s => s.TenTrieuChung.ToLower() == dto.SymptomName.Trim().ToLower());
 
             if (existSymptom != null)
-                return (false, "Symptom already exist");
+                return (false, "Symptom already exists");
 
             var trieuChung = new TrieuChung
             {
-                TenTrieuChung = dto.SymptomName,
-                MoTa = dto.Description,
-                DangHoatDong = dto.IsActive,
+                TenTrieuChung = dto.SymptomName.Trim(),
+                MoTa = dto.Description?.Trim(),
+                DangHoatDong = true,
                 NgayTao = DateTime.Now
             };
 
             _context.TrieuChungs.Add(trieuChung);
+            
             await _context.SaveChangesAsync();
             return (true, "Add success");
         }
 
         public async Task<(bool IsSuccess, string Message)> UpdateSymptomAsync(SymptomCreateUpdateDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.SymptomName))
+                return (false, "Symptom name cannot be empty");
+
             var trieuChung = await _context.TrieuChungs.FindAsync(dto.SymptomId);
             if (trieuChung == null) return (false, "Not found Symptom");
 
-            trieuChung.TenTrieuChung = dto.SymptomName;
-            trieuChung.MoTa = dto.Description;
-            trieuChung.DangHoatDong = dto.IsActive;
+            var exists = await _context.TrieuChungs.AnyAsync(s => s.MaTrieuChung != dto.SymptomId && s.TenTrieuChung.ToLower() == dto.SymptomName.Trim().ToLower());
+            if (exists)
+                return (false, "Symptom name already exists");
 
+            trieuChung.TenTrieuChung = dto.SymptomName.Trim();
+            trieuChung.MoTa = dto.Description?.Trim();
             await _context.SaveChangesAsync();
             return (true, "Update success");
         }
@@ -80,11 +89,11 @@ namespace Project_CNPM.Area.Admin.Services
         public async Task<(bool IsSuccess, string Message)> SolfDeleteAsync(int id)
         {
             var symptom = await _context.TrieuChungs.FindAsync(id);
-
+            if (symptom == null) return (false, "Not found symptom");
             symptom.DangHoatDong = false;
 
+            await _context.SaveChangesAsync();
             return (true, "Turn off success");
-
         }
     }
 }

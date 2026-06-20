@@ -13,12 +13,18 @@ namespace Project_CNPM.Area.Admin.Services
         {
             _context = context;
         }
-        public async Task<(bool IsSuccess, string Message, NguoiDung? User)> LoginAsync(loginDto request)
+       public async Task<(bool IsSuccess, string Message, NguoiDung? User)> LoginAsync(loginDto request)
         {
             var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.Email == request.email);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.password, user.MatKhauMaHoa))
-                return (false, "User not found", (NguoiDung?)null);
+                return (false, "User not found or incorrect password", null);
+
+            if (user.DeleteAt != null)
+                return (false, "This account has been deleted", null);
+
+            if (user.BiKhoa == true)
+                return (false, "This account is currently locked by Administrator", null);
 
             return (true, "Login successful", user);
         }
