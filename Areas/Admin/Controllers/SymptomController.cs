@@ -1,11 +1,14 @@
 using Project_CNPM.Area.Admin.DTOs;
 using Project_CNPM.Area.Admin.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
+    [Authorize(Roles="Admin")]
+
     public class SymptomController : Controller
     {
         private readonly ISymptomAdminService _symptomAdminService;

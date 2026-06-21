@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_CNPM.Area.Admin.DTOs;
 using Project_CNPM.Area.Admin.Services;
@@ -6,6 +7,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
+    [Authorize(Roles="Admin")]
     public class SafetyWarningController : Controller
     {
         private readonly ISafetyWarningAdminService _safetyWarningAdminService;

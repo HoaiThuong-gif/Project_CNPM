@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_CNPM.Area.Admin.Services;
 
@@ -5,6 +6,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
+    [Authorize(Roles="Admin")]
     public class UserController : Controller
     {
         private readonly IUserAdminService _userAdminService;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_CNPM.Area.Admin.DTOs;
 using Project_CNPM.Area.Admin.Services;
@@ -6,6 +7,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
+    [Authorize]
     public class MedicineController : Controller
     {
         private readonly IMedicineAdminService _medicineAdminService;
@@ -34,6 +36,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> CreateMedicine(MedicineCreateDto medicine)
         {
             var result = await _medicineAdminService.CreateMedicineAsync(medicine);
@@ -45,6 +48,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("update")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> UpdateMedicine(MedicineUpdateDto medicine)
         {
             var result = await _medicineAdminService.UpdateMedicineAsync(medicine);
@@ -56,6 +60,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("status")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> ToggleMedicineStatus(int id, bool isActive)
         {
             var result = await _medicineAdminService.ToggleMedicineStatusAsync(id, isActive);

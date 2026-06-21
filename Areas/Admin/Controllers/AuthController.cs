@@ -30,6 +30,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             
             return Ok(new { 
                 message = "Đăng nhập thành công!",
+                token = result.Token,
                 userId = result.User.MaNguoiDung,
                 username = result.User.HoTen,
                 });

@@ -17,8 +17,8 @@ CREATE TABLE NguoiDung (
     GioiTinh        NVARCHAR(10),
     NgaySinh        DATE,
     VaiTro          VARCHAR(20)     DEFAULT 'User',
-    BiKhoa          BIT             DEFAULT 0,      -- khóa tạm thời
-    DeleteAt        DATETIME        NULL,           -- NULL = chưa xóa, có giá trị = đã xóa mềm
+    BiKhoa          BIT             DEFAULT 0,      
+    DeleteAt        DATETIME        NULL,           
     NgayTao         DATETIME        DEFAULT GETDATE(),
 
     CONSTRAINT CK_NguoiDung_VaiTro CHECK (VaiTro IN ('User', 'Admin'))
@@ -34,8 +34,8 @@ CREATE TABLE Benh (
     MaBenh              INT IDENTITY(1,1) PRIMARY KEY,
     TenBenh             NVARCHAR(150)   NOT NULL,
     MoTa                NVARCHAR(MAX),
-    NhomBenh            NVARCHAR(100),              -- hô hấp, tiêu hoá, tim mạch...
-    MucDoNghiemTrong    INT             DEFAULT 1,  -- 1: nhẹ, 2: trung bình, 3: nặng (ảnh hưởng scoring)
+    NhomBenh            NVARCHAR(100),              
+    MucDoNghiemTrong    INT             DEFAULT 1, 
     DangHoatDong        BIT             DEFAULT 1,
     DeleteAt            DATETIME        NULL,
     NgayTao             DATETIME        DEFAULT GETDATE(),
@@ -159,8 +159,8 @@ CREATE TABLE Thuoc (
     MaThuoc         INT IDENTITY(1,1) PRIMARY KEY,
     TenThuoc        NVARCHAR(150)   NOT NULL,
     HoatChat        NVARCHAR(255),
-    NhomThuoc       NVARCHAR(100),              -- kháng sinh, giảm đau, hạ sốt, kháng viêm...
-    DangBaoChe      NVARCHAR(100),              -- viên nén, siro, bột, tiêm...
+    NhomThuoc       NVARCHAR(100),              
+    DangBaoChe      NVARCHAR(100),             
     CongDung        NVARCHAR(MAX),
     LieuDung        NVARCHAR(MAX),
     CachDung        NVARCHAR(MAX),
@@ -169,7 +169,7 @@ CREATE TABLE Thuoc (
     CanKeDon        BIT             DEFAULT 0,  -- 0: OTC (tự mua), 1: cần kê đơn bác sĩ
     DangHoatDong    BIT             DEFAULT 1,
     NgayTao         DATETIME        DEFAULT GETDATE(),
-    NgayCapNhat     DATETIME        NULL        -- cập nhật khi sửa thông tin → cần re-embed
+    NgayCapNhat     DATETIME        NULL        
 );
 GO
 
