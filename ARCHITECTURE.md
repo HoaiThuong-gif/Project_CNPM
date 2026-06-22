@@ -1,198 +1,162 @@
 # Kiến trúc dự án Project_CNPM
 
-`Project_CNPM` là ứng dụng ASP.NET Core 8 theo mô hình MVC kết hợp API controller. Backend C# dùng Entity Framework Core làm việc với SQL Server, đồng thời gọi một service Python Flask để tạo embedding và gợi ý thuốc bằng vector search.
+`Project_CNPM` là ứng dụng ASP.NET Core 8 theo mô hình MVC kết hợp API controller. Hệ thống dùng Entity Framework Core làm việc với SQL Server và gọi thêm service Flask để gợi ý thuốc bằng vector search.
 
 ## 1. Tổng quan hệ thống
 
-Hệ thống hiện có ba nhóm chức năng chính:
+Hệ thống hiện có 3 lớp chính:
 
-- Quản trị hệ thống: đăng nhập/đăng ký, dashboard, quản lý người dùng, thuốc, bệnh, triệu chứng, cảnh báo an toàn và liên kết thuốc-bệnh.
-- Dự đoán cho người dùng: người dùng gửi bệnh và mô tả triệu chứng, hệ thống gọi AI service để gợi ý thuốc, lưu lịch sử, trả cảnh báo và nhận đánh giá kết quả.
-- AI service: Flask API xử lý embedding thuốc, xóa vector thuốc, tìm thuốc phù hợp và kiểm tra trạng thái service.
+- MVC views cho giao diện người dùng và quản trị.
+- API controllers cho dữ liệu nghiệp vụ.
+- Service layer xử lý nghiệp vụ, truy cập database và gọi Flask khi cần.
 
-Luồng backend tổng quát:
+Luồng tổng quát:
 
-1. Client gọi API ASP.NET Core.
-2. Controller nhận DTO, route parameter hoặc query parameter.
-3. Controller kiểm tra dữ liệu cơ bản và gọi service tương ứng.
-4. Service xử lý nghiệp vụ, đọc/ghi dữ liệu qua `ApplicationDbContext`.
-5. `ApplicationDbContext` ánh xạ dữ liệu SQL Server sang entity trong `Models`.
-6. Controller trả JSON cho API hoặc Razor view cho MVC.
+1. Người dùng thao tác ở Razor view.
+2. JavaScript phía client gọi API ASP.NET Core.
+3. Controller nhận request, kiểm tra quyền và gọi service.
+4. Service xử lý nghiệp vụ, dùng `ApplicationDbContext` để đọc/ghi SQL Server.
+5. Riêng phần dự đoán thuốc và mapping thuốc-bệnh có thể gọi thêm Flask service.
 
-Luồng liên kết thuốc-bệnh:
-
-1. Admin gọi API trong `MedicineDiseaseMappingController`.
-2. `MedicineDiseaseMappingService` tạo hoặc xóa record trong bảng `BenhThuoc`.
-3. Khi tạo liên kết, service gọi Flask `POST /embed-drug` để đồng bộ vector thuốc.
-4. Khi xóa liên kết, service gọi Flask `POST /remove-drug`, sau đó đồng bộ lại các mapping còn lại của thuốc nếu cần.
-
-Luồng dự đoán thuốc:
-
-1. User đăng nhập qua `AuthController` và nhận JWT.
-2. User gọi `POST /api/UserPrediction/predict`.
-3. `UserPredictionService` kiểm tra bệnh đang hoạt động và nội dung triệu chứng.
-4. Service gọi Flask `POST /predict` với bệnh, triệu chứng và `top_k = 5`.
-5. Service lấy thêm cảnh báo dị ứng, bệnh nền và tương tác thuốc từ SQL Server.
-6. Kết quả được lưu vào `LichSuDuDoan` và `KetQuaDuDoan`.
-7. API trả danh sách thuốc gợi ý kèm `ResultId` để frontend gửi feedback.
-8. User có thể gửi đánh giá qua `POST /api/UserPrediction/feedback`.
-9. User có thể xem hoặc xóa lịch sử qua các API `history`.
-
-## 2. Cấu trúc thư mục
+## 2. Cấu trúc thư mục chính
 
 ```text
 Project_CNPM/
-+-- Areas/
-|   +-- Admin/
-|       +-- Controllers/
-|       +-- DTOs/
-|       +-- Services/
-+-- Controllers/
-|   +-- HomeController.cs
-|   +-- UserPredictionController.cs
-+-- Data/
-|   +-- ApplicationDbContext.cs
-+-- DTOs/
-|   +-- UserDto.cs
-+-- Models/
-+-- Services/
-|   +-- IUserPredictionService.cs
-|   +-- UserPredictionService.cs
-+-- Views/
-+-- wwwroot/
-+-- docs/
-+-- src/
-|   +-- app.py
-|   +-- predict.py
-|   +-- seed_from_csv.py
-|   +-- vector_store.py
-+-- appsettings.json
-+-- appsettings.Development.json
-+-- docker-compose.yml
-+-- Program.cs
-+-- Project_CNPM.csproj
-+-- SQL.sql
-+-- drug_metadata.json
-+-- drugs_vector.npy
-+-- TutorialViews.md
-+-- ARCHITECTURE.md
+├── Areas/
+│   └── Admin/
+│       ├── Controllers/
+│       ├── DTOs/
+│       ├── Services/
+│       └── Views/
+├── Controllers/
+├── Data/
+├── DTOs/
+├── Models/
+├── Services/
+├── Views/
+├── wwwroot/
+├── docs/
+├── src/
+├── Program.cs
+├── Project_CNPM.csproj
+├── TutorialViews.md
+└── ARCHITECTURE.md
 ```
 
-## 3. Công nghệ sử dụng
+## 3. MVC controllers hiện có
 
-Backend C#:
+Controllers phía user/public:
 
-- ASP.NET Core MVC/API trên `.NET 8`.
-- Entity Framework Core 8.
-- SQL Server.
-- JWT Bearer Authentication.
-- `BCrypt.Net-Next` để hash và kiểm tra mật khẩu.
-- `HttpClient` để gọi Flask service.
+- `HomeController`
+- `AccountController`
+- `DuDoanController`
+- `ThuocController`
+- `ErrorController`
 
-AI service Python:
+Controllers API/user:
 
-- Flask.
-- `sentence-transformers`.
-- Model `intfloat/multilingual-e5-small`.
-- NumPy.
-- `requests`.
-- `pyodbc` cho script seed.
+- `UserPredictionController`
 
-Hạ tầng local:
+Controllers admin area:
 
-- `docker-compose.yml` chạy SQL Server 2019 trên port `1433`.
-- `SQL.sql` chứa schema và dữ liệu khởi tạo.
-- Flask service chạy mặc định tại `http://localhost:5000`.
+- `PortalController`
+- `AuthController`
+- `DashboardController`
+- `MedicineController`
+- `DiseaseController`
+- `SymptomController`
+- `SafetyWarningController`
+- `MedicineDiseaseMappingController`
+- `UserAdminController.cs` chứa class runtime là `UserController`
 
-## 4. Cấu hình ứng dụng
+## 4. MVC routes/view hiện có
 
-`Program.cs` đăng ký các thành phần chính:
+Public:
 
-- `ApplicationDbContext` dùng connection string `DefaultConnection`.
-- `IAuthService -> AuthService`
-- `IMedicineAdminService -> MedicineAdminService`
-- `IDiseaseAdminService -> DiseaseAdminService`
-- `ISymptomAdminService -> SymptomAdminService`
-- `IUserAdminService -> UserAdminService`
-- `ISafetyWarningAdminService -> SafetyWarningAdminService`
-- `IDashboardAdminService -> DashboardAdminService`
-- `IMedicineDiseaseMappingService -> MedicineDiseaseMappingService` qua `AddHttpClient`
-- `IUserPredictionService -> UserPredictionService` qua `AddHttpClient`
-- JWT Bearer Authentication.
+- `/` hoặc `/Home/Index` -> `Views/Home/TrangChu.cshtml`
+- `/Account/DangNhap` -> `Views/Account/DangNhap.cshtml`
+- `/Account/DangKy` -> `Views/Account/DangKy.cshtml`
 
-Middleware pipeline:
+User portal:
 
-- `UseStaticFiles`
-- `UseRouting`
-- `UseAuthentication`
-- `UseAuthorization`
-- MVC route mặc định `{controller=Home}/{action=Index}/{id?}`
+- `/DuDoan/NhapThongTinBenh` -> `Views/DuDoan/NhapThongTinBenh.cshtml`
+- `/DuDoan/KetQuaDuDoan` -> `Views/DuDoan/KetQuaDuDoan.cshtml`
+- `/DuDoan/LichSuTraCuu` -> `Views/DuDoan/LichSuTraCuu.cshtml`
+- `/DuDoan/TongQuan` -> `Views/DuDoan/TongQuan.cshtml`
+- `/Thuoc/ChiTietThuoc/{id?}` -> `Views/Thuoc/ChiTietThuoc.cshtml`
+- `/Thuoc/DanhSachThuoc` -> `Views/Thuoc/DanhSachThuoc.cshtml`
 
-`UseHttpsRedirection` đang được comment.
+Admin portal:
 
-## 5. Xác thực và phân quyền
+- `/Admin`
+- `/Admin/Dashboard`
+- `/Admin/QuanLyThuoc`
+- `/Admin/QuanLyBenh`
+- `/Admin/QuanLyTrieuChung`
+- `/Admin/QuanLyNguoiDung`
+- `/Admin/QuanLyDiUng`
+- `/Admin/ThongKe`
 
-`AuthService` tạo JWT khi đăng nhập thành công. Token có các claim:
+Error pages:
 
-- `ClaimTypes.NameIdentifier`: mã người dùng.
-- `ClaimTypes.Email`: email.
-- `ClaimTypes.Name`: họ tên.
-- `ClaimTypes.Role`: vai trò người dùng.
+- `/Error/Forbidden`
+- `/Error/NotFoundPage`
+- `/Error/ServerError`
 
-Phân quyền API:
+## 5. Layouts đang dùng
 
-- `AuthController` không yêu cầu token.
-- Các API quản trị phần lớn yêu cầu role `Admin`.
-- `MedicineController` yêu cầu đăng nhập để xem thuốc; tạo, cập nhật và bật/tắt thuốc yêu cầu role `Admin`.
-- `UserPredictionController` yêu cầu user đã đăng nhập.
+User portal:
 
-## 6. API controller
+- `Views/Shared/_UserPortalLayout.cshtml`
 
-### AuthController
+Admin portal:
 
-Route base: `api/Auth`
+- `Areas/Admin/Views/Shared/_Layout.cshtml`
+
+Điểm cần lưu ý:
+
+- Public page và auth page dùng CSS riêng trong `wwwroot/css/shared` và `wwwroot/css/account`.
+- User portal và admin portal đều dùng sidebar riêng, không còn phụ thuộc layout mặc định cũ của template ASP.NET.
+
+## 6. Authentication và phân quyền
+
+JWT được tạo ở `AuthService` khi đăng nhập thành công. Token chứa các claim chính:
+
+- `ClaimTypes.NameIdentifier`
+- `ClaimTypes.Email`
+- `ClaimTypes.Name`
+- `ClaimTypes.Role`
+
+Phân quyền đang áp dụng:
+
+- `AuthController`: không yêu cầu token cho login/register.
+- `UserPredictionController`: yêu cầu người dùng đã đăng nhập.
+- `PortalController`: yêu cầu role `Admin`.
+- Phần lớn API admin yêu cầu `Admin`.
+- `DiseaseController` hiện cho phép người dùng đã đăng nhập đọc danh sách bệnh để phục vụ form dự đoán.
+
+Frontend đang dùng JWT từ `localStorage` để gọi API.
+
+## 7. API controllers hiện có
+
+### `api/Auth`
 
 - `POST /api/Auth/login`
 - `POST /api/Auth/register`
 - `POST /api/Auth/logout?userId={id}`
 
-Đăng nhập trả JWT, `userId` và `username`.
+### `api/UserPrediction`
 
-### DashboardController
+- `POST /api/UserPrediction/predict`
+- `POST /api/UserPrediction/feedback`
+- `GET /api/UserPrediction/history`
+- `DELETE /api/UserPrediction/history/{historyId}`
 
-Route base: `api/admin/Dashboard`
+### `api/admin/Dashboard`
 
 - `GET /api/admin/Dashboard/statistics`
 
-Trả thống kê tổng số user, thuốc, bệnh đang hoạt động và số lượt dự đoán.
-
-### DiseaseController
-
-Route base: `api/Disease`
-
-- `GET /api/Disease`
-- `GET /api/Disease/{id}`
-- `POST /api/Disease/create`
-- `PATCH /api/Disease/Update`
-- `PATCH /api/Disease/toggle?id={id}`
-
-Quản lý danh mục bệnh, gồm xem danh sách, xem chi tiết, tạo, cập nhật và bật/tắt trạng thái.
-
-### SymptomController
-
-Route base: `api/Symptom`
-
-- `GET /api/Symptom`
-- `GET /api/Symptom/{id}`
-- `POST /api/Symptom/create`
-- `PATCH /api/Symptom/update`
-- `PATCH /api/Symptom/toggle?id={id}`
-
-Quản lý danh mục triệu chứng.
-
-### MedicineController
-
-Route base: `api/Medicine`
+### `api/Medicine`
 
 - `GET /api/Medicine`
 - `GET /api/Medicine/{id}`
@@ -200,257 +164,134 @@ Route base: `api/Medicine`
 - `PATCH /api/Medicine/update`
 - `PATCH /api/Medicine/toggle?id={id}&isActive={true|false}`
 
-Quản lý danh mục thuốc và trạng thái hoạt động của thuốc.
+### `api/Disease`
 
-### MedicineDiseaseMappingController
+- `GET /api/Disease`
+- `GET /api/Disease/{id}`
+- `POST /api/Disease/create`
+- `PATCH /api/Disease/Update`
+- `PATCH /api/Disease/toggle?id={id}`
 
-Route base: `api/admin/MedicineDiseaseMapping`
+### `api/Symptom`
+
+- `GET /api/Symptom`
+- `GET /api/Symptom/{id}`
+- `POST /api/Symptom/create`
+- `PATCH /api/Symptom/update`
+- `PATCH /api/Symptom/toggle?id={id}`
+
+### `api/SafetyWarning`
+
+- `GET /api/SafetyWarning/allergies`
+- `POST /api/SafetyWarning/allergies/create`
+- `PATCH /api/SafetyWarning/allergies/update`
+- `PATCH /api/SafetyWarning/allergies/toggle?id={id}&isActive={true|false}`
+- `GET /api/SafetyWarning/background-diseases`
+- `POST /api/SafetyWarning/background-diseases/create`
+- `PATCH /api/SafetyWarning/background-diseases/update`
+- `PATCH /api/SafetyWarning/background-diseases/toggle?id={id}&isActive={true|false}`
+- `GET /api/SafetyWarning/drug-interactions`
+- `POST /api/SafetyWarning/drug-interactions/create`
+- `DELETE /api/SafetyWarning/drug-interactions/{medicine1Id}/{medicine2Id}`
+
+### `api/admin/MedicineDiseaseMapping`
 
 - `GET /api/admin/MedicineDiseaseMapping/medicine/{medicineId}/diseases`
 - `GET /api/admin/MedicineDiseaseMapping/disease/{diseaseId}/medicines`
 - `POST /api/admin/MedicineDiseaseMapping/link`
 - `DELETE /api/admin/MedicineDiseaseMapping/unlink/medicine/{medicineId}/disease/{diseaseId}`
 
-Quản lý quan hệ thuốc-bệnh và đồng bộ dữ liệu sang vector store của AI service.
+### `api/User`
 
-### SafetyWarningController
-
-Route base: `api/SafetyWarning`
-
-Dị ứng:
-
-- `GET /api/SafetyWarning/allergies`
-- `POST /api/SafetyWarning/allergies/create`
-- `PATCH /api/SafetyWarning/allergies/update`
-- `PATCH /api/SafetyWarning/allergies/toggle?id={id}&isActive={true|false}`
-
-Bệnh nền:
-
-- `GET /api/SafetyWarning/background-diseases`
-- `POST /api/SafetyWarning/background-diseases/create`
-- `PATCH /api/SafetyWarning/background-diseases/update`
-- `PATCH /api/SafetyWarning/background-diseases/toggle?id={id}&isActive={true|false}`
-
-Tương tác thuốc:
-
-- `GET /api/SafetyWarning/drug-interactions`
-- `POST /api/SafetyWarning/drug-interactions/create`
-- `DELETE /api/SafetyWarning/drug-interactions/{medicine1Id}/{medicine2Id}`
-
-Quản lý dữ liệu cảnh báo an toàn cho thuốc.
-
-### UserController
-
-File hiện nằm tại `Areas/Admin/Controllers/UserAdminController.cs`, nhưng class bên trong là `UserController`, nên route runtime là `api/User`.
+File controller nằm ở `Areas/Admin/Controllers/UserAdminController.cs`, nhưng class runtime là `UserController`, nên route thật là:
 
 - `GET /api/User`
 - `PATCH /api/User/{userId}/lock?isLocked={true|false}`
 - `DELETE /api/User/{userId}`
 
-Quản lý người dùng, khóa/mở khóa tài khoản và xóa mềm.
+## 8. Service layer
 
-### UserPredictionController
+Admin services:
 
-Route base: `api/UserPrediction`
+- `AuthService`
+- `DashboardAdminService`
+- `MedicineAdminService`
+- `DiseaseAdminService`
+- `SymptomService`
+- `SafetyAdminService`
+- `MedicineDiseaseMappingService`
+- `UserAdminService`
 
-- `POST /api/UserPrediction/predict`
-- `POST /api/UserPrediction/feedback`
-- `GET /api/UserPrediction/history`
-- `DELETE /api/UserPrediction/history/{historyId}`
+User services:
 
-Xử lý dự đoán thuốc cho user, nhận đánh giá kết quả, xem lịch sử và xóa lịch sử.
+- `UserPredictionService`
 
-### HomeController
+Trách nhiệm chính:
 
-Controller MVC mặc định:
+- Xử lý login/register/JWT.
+- CRUD danh mục admin.
+- Đồng bộ mapping thuốc-bệnh với Flask vector store.
+- Gọi Flask để dự đoán thuốc cho user.
+- Lưu lịch sử dự đoán và feedback.
 
-- `GET /Home/Index`
-- `GET /Home/Privacy`
-- `GET /Home/Error`
+## 9. Luồng dự đoán thuốc hiện tại
 
-## 7. Service C#
+1. User đăng nhập.
+2. Frontend mở `GET /DuDoan/NhapThongTinBenh`.
+3. Trang gọi `GET /api/Disease` để nạp danh sách bệnh.
+4. User nhập bệnh, triệu chứng và thông tin sức khỏe liên quan.
+5. Frontend ghép thêm tuổi, giới tính, mức độ triệu chứng, dị ứng, bệnh nền, thuốc đang dùng vào chuỗi `symptoms`.
+6. Frontend gọi `POST /api/UserPrediction/predict`.
+7. Backend gọi `UserPredictionService`, từ đó gọi Flask `/predict`.
+8. Backend trả danh sách thuốc gợi ý, cảnh báo và `resultId`.
+9. Frontend lưu tạm dữ liệu ở `sessionStorage` rồi chuyển sang `GET /DuDoan/KetQuaDuDoan`.
+10. User có thể gửi feedback qua `POST /api/UserPrediction/feedback`.
+11. User có thể xem lịch sử qua `GET /api/UserPrediction/history` và xóa qua `DELETE /api/UserPrediction/history/{historyId}`.
 
-### AuthService
+## 10. Database và models
 
-- Đăng nhập.
-- Đăng ký.
-- Logout.
-- Hash mật khẩu bằng `BCrypt`.
-- Tạo JWT có hạn 7 ngày.
-- Kiểm tra tài khoản bị khóa hoặc đã xóa mềm.
+`Data/ApplicationDbContext.cs` là DbContext chính.
 
-### DashboardAdminService
+Nhóm entity quan trọng:
 
-Tổng hợp thống kê:
+- Người dùng: `NguoiDung`
+- Bệnh và triệu chứng: `Benh`, `TrieuChung`, `BenhTrieuChung`
+- Thuốc và thành phần: `Thuoc`, `ThanhPhan`, `BenhThuoc`, `QuyTacGoiYthuoc`
+- Cảnh báo an toàn: `DiUng`, `BenhNen`, `CanhBaoDiUngThuoc`, `CanhBaoBenhNenThuoc`, `TuongTacThuoc`
+- Dự đoán: `LichSuDuDoan`, `ChiTietTrieuChung`, `KetQuaDuDoan`, `DanhGiaDuDoan`
 
-- User đang hoạt động.
-- Thuốc đang hoạt động.
-- Bệnh đang hoạt động.
-- Lượt dự đoán.
+## 11. Flask AI service
 
-### DiseaseAdminService
+File chính:
 
-- Lấy danh sách bệnh.
-- Lấy bệnh theo id.
-- Tạo bệnh.
-- Cập nhật bệnh.
-- Bật/tắt trạng thái bệnh.
+- `src/app.py`
+- `src/predict.py`
+- `src/vector_store.py`
 
-### SymptomAdminService
+Endpoint Flask đang được backend dùng:
 
-- Lấy danh sách triệu chứng.
-- Lấy triệu chứng theo id.
-- Tạo triệu chứng.
-- Cập nhật triệu chứng.
-- Bật/tắt trạng thái triệu chứng.
+- `POST /embed-drug`
+- `POST /remove-drug`
+- `POST /predict`
+- `GET /health`
 
-### MedicineAdminService
+## 12. Những điểm đã loại khỏi tài liệu
 
-- Lấy danh sách thuốc.
-- Lấy thuốc theo id.
-- Tạo thuốc.
-- Cập nhật thuốc.
-- Bật/tắt trạng thái thuốc.
+Các mục sau không còn được xem là luồng chuẩn hiện tại nên không mô tả dài ở đây:
 
-### MedicineDiseaseMappingService
+- `Views/Home/Privacy.cshtml`
+- layout mặc định cũ của template ASP.NET
+- các file HTML/CSS/JS tách rời đời đầu ngoài `Views/` và `wwwroot/`
 
-- Liên kết thuốc với bệnh.
-- Hủy liên kết thuốc với bệnh.
-- Lấy danh sách bệnh của một thuốc.
-- Lấy danh sách thuốc của một bệnh.
-- Gọi Flask service để đồng bộ vector thuốc.
+## 13. Kiểm chứng
 
-### SafetyWarningAdminService
-
-- Quản lý dị ứng.
-- Quản lý bệnh nền.
-- Quản lý tương tác thuốc.
-- Chuẩn hóa cặp thuốc theo thứ tự `min/max` để tránh trùng cặp đảo chiều.
-
-### UserAdminService
-
-- Lấy danh sách người dùng.
-- Khóa/mở khóa người dùng.
-- Xóa mềm người dùng.
-
-### UserPredictionService
-
-- Gọi Flask `POST /predict`.
-- Lấy cảnh báo dị ứng, bệnh nền và tương tác thuốc liên quan.
-- Lưu lịch sử dự đoán vào `LichSuDuDoan`.
-- Lưu snapshot kết quả vào `KetQuaDuDoan`.
-- Trả kết quả dự đoán cho frontend.
-- Lưu feedback của user vào `DanhGiaDuDoan`.
-- Lấy lịch sử dự đoán của user.
-- Xóa lịch sử dự đoán của user.
-
-## 8. DTO
-
-DTO admin:
-
-- `AuthDto.cs`: `loginDto`, `registerDto`.
-- `DashboardDto.cs`: `SystemStatisticsDto`.
-- `DiseaseDto.cs`: `DiseaseCreateDto`, `DiseaseUpdateDto`, `DiseaseDetailDto`.
-- `MedicineDto.cs`: `MedicineCreateDto`, `MedicineUpdateDto`, `MedicineDetailDto`.
-- `SafetyWarningDto.cs`: `AllergyCreateUpdateDto`, `BackgroundDiseaseCreateUpdateDto`, `DrugInteractionCreateDto`, `DrugInteractionDetailDto`.
-- `SymptomDto.cs`: `SymptomCreateUpdateDto`, `SymptomDetailDto`.
-- `UserAdminDto.cs`: `UserAdminViewDto`.
-- `medicineDiseaseDto.cs`: `DiseaseLinkedWithMedicineDto`, `MedicineLinkedWithDiseaseDto`, `LinkMedicineDiseaseDto`.
-
-DTO user:
-
-- `PredictRequestDto`: dữ liệu yêu cầu dự đoán.
-- `PredictResultDto`: dữ liệu trả kết quả dự đoán, gồm cảnh báo và `ResultId`.
-- `FeedbackRequestDto`: dữ liệu gửi đánh giá.
-- `PythonPredictResponse`: dữ liệu nhận từ Flask.
-- `PythonDrugResult`: từng thuốc trong kết quả Flask.
-
-## 9. Data và Models
-
-`Data/ApplicationDbContext.cs` là DbContext chính của hệ thống.
-
-Nhóm entity chính:
-
-- Người dùng: `NguoiDung`.
-- Bệnh và triệu chứng: `Benh`, `TrieuChung`, `BenhTrieuChung`.
-- Thuốc và thành phần: `Thuoc`, `ThanhPhan`, `BenhThuoc`, `QuyTacGoiYthuoc`.
-- Cảnh báo an toàn: `DiUng`, `BenhNen`, `CanhBaoDiUngThuoc`, `CanhBaoBenhNenThuoc`, `TuongTacThuoc`.
-- Dự đoán: `LichSuDuDoan`, `ChiTietTrieuChung`, `KetQuaDuDoan`, `DanhGiaDuDoan`.
-
-## 10. AI service Python
-
-### `src/app.py`
-
-Flask API cung cấp các endpoint:
-
-- `POST /embed-drug`: tạo hoặc cập nhật vector thuốc.
-- `POST /remove-drug`: xóa vector thuốc.
-- `POST /predict`: gợi ý thuốc theo bệnh và triệu chứng.
-- `GET /health`: kiểm tra trạng thái service.
-
-### `src/predict.py`
-
-`DrugRecommender` dùng model `intfloat/multilingual-e5-small`.
-
-Trọng số tính điểm:
-
-- Similarity: `0.6`
-- Độ ưu tiên điều trị: `0.3`
-- Bonus cùng bệnh: `0.1`
-
-Thuốc cần kê đơn đang bị loại khỏi kết quả gợi ý.
-
-### `src/vector_store.py`
-
-`VectorStore` quản lý:
-
-- `drugs_vector.npy`: vector thuốc.
-- `drug_metadata.json`: metadata thuốc.
-
-Các thao tác chính gồm load, save, upsert, delete và search.
-
-### `src/seed_from_csv.py`
-
-Script dùng để seed vector thuốc từ dữ liệu CSV và SQL Server, sau đó gọi Flask `POST /embed-drug`.
-
-## 11. Tài liệu nghiệp vụ
-
-Thư mục `docs/` gồm:
-
-- `business_analysis.md`
-- `project_scope.md`
-- `functional_requirements.md`
-- `non_functional_requirements.md`
-- `user_stories.md`
-- `acceptance_criteria.md`
-- `user_survey.md`
-
-## 12. Trạng thái kiểm chứng
-
-Lệnh kiểm tra:
+Lệnh build gần nhất:
 
 ```text
-dotnet build
+dotnet msbuild /t:Compile /p:UseAppHost=false
 ```
 
-## 13. Ghi chú kỹ thuật
+Trạng thái:
 
-- Một số chuỗi tiếng Việt trong source code đang bị mojibake.
-- `appsettings.json` đang chứa connection string và JWT key trực tiếp.
-- `ApplicationDbContext.OnConfiguring` vẫn còn connection string scaffold.
-- `MedicineAdminService` inject `HttpClient` nhưng chưa dùng trong create/update/toggle.
-- `ISymptomServeice.cs` và một số tên hàm/biến còn sai chính tả.
-- File `UserAdminController.cs` chứa class `UserController`.
-- Route API chưa thống nhất giữa `api/[Controller]` và `api/admin/[controller]`.
-- Chưa có test tự động trong repo.
-
-## 14. Hướng đọc mã
-
-1. Đọc `Program.cs` để hiểu DI, JWT, middleware và route nền.
-2. Đọc `Data/ApplicationDbContext.cs` để hiểu database schema.
-3. Đọc các entity chính trong `Models`.
-4. Đọc DTO trong `Areas/Admin/DTOs` và `DTOs/UserDto.cs`.
-5. Đọc service admin trong `Areas/Admin/Services`.
-6. Đọc `Services/UserPredictionService.cs`.
-7. Đọc controller trong `Areas/Admin/Controllers` và `Controllers/UserPredictionController.cs`.
-8. Đọc `src/app.py`, `src/predict.py`, `src/vector_store.py` khi làm phần AI.
+- Build qua.
+- Vẫn còn một số warning nullability và cảnh báo connection string scaffold trong `ApplicationDbContext.cs`.

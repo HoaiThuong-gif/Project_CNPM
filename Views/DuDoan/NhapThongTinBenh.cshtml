@@ -1,0 +1,127 @@
+@{
+    Layout = "~/Views/Shared/_UserPortalLayout.cshtml";
+    ViewData["Title"] = "Dự đoán thuốc";
+    ViewData["UserSection"] = "Dự đoán thuốc";
+}
+
+<section class="prediction-page">
+    <div class="user-page-header">
+        <div>
+            <h1 class="user-page-title">Dự đoán thuốc phù hợp</h1>
+            <p class="user-page-subtitle">Nhập bệnh và thông tin sức khỏe để nhận gợi ý thuốc cá nhân hóa.</p>
+        </div>
+    </div>
+
+    <div class="user-warning-banner">
+        <strong>Cảnh báo quan trọng:</strong> Kết quả gợi ý thuốc chỉ mang tính tham khảo, không thay thế tư vấn, chẩn đoán hoặc chỉ định điều trị từ bác sĩ, dược sĩ hoặc nhân viên y tế có chuyên môn.
+    </div>
+
+    <div class="user-grid">
+        <div class="user-column">
+            <form class="medical-form"
+                  data-diseases-url="/api/Disease"
+                  data-predict-url="/api/UserPrediction/predict"
+                  data-result-url="@Url.Action("KetQuaDuDoan", "DuDoan")"
+                  data-login-url="@Url.Action("DangNhap", "Account")">
+                <section class="user-form-section">
+                    <h2 class="user-section-title">Tên bệnh</h2>
+                    <div class="input-group" id="predictionNoticeWrapper"></div>
+                    <div class="input-group">
+                        <label for="diseaseId">Chọn bệnh <span style="color:#e95d6a">*</span></label>
+                        <select id="diseaseId" name="diseaseId" required>
+                            <option value="">Đang tải danh sách bệnh...</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="user-form-section">
+                    <h2 class="user-section-title">Thông tin sức khỏe cơ bản</h2>
+                    <div class="user-form-row">
+                        <div class="input-group">
+                            <label for="patientAge">Tuổi</label>
+                            <input id="patientAge" type="number" min="0" placeholder="VD: 45">
+                        </div>
+                        <div class="input-group">
+                            <label for="patientGender">Giới tính</label>
+                            <select id="patientGender">
+                                <option value="">-- Chọn --</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="user-form-section">
+                    <h2 class="user-section-title">Thông tin y tế liên quan</h2>
+                    <div class="input-group">
+                        <label for="symptomSeverity">Mức độ triệu chứng <span style="color:#e95d6a">*</span></label>
+                        <select id="symptomSeverity" required>
+                            <option value="">-- Chọn mức độ --</option>
+                            <option value="Nhẹ">Nhẹ</option>
+                            <option value="Trung bình">Trung bình</option>
+                            <option value="Nặng">Nặng</option>
+                            <option value="Rất nặng">Rất nặng</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="backgroundDiseaseInput">Bệnh nền</label>
+                        <div class="user-inline-entry">
+                            <input id="backgroundDiseaseInput" type="text" placeholder="VD: Tiểu đường, tim mạch...">
+                            <button class="user-secondary-button" type="button" id="btnAddBackgroundDisease">+</button>
+                        </div>
+                    </div>
+                    <div id="backgroundDiseaseList" class="user-chip-list"></div>
+
+                    <div class="input-group">
+                        <label for="currentMedicineInput">Thuốc đang sử dụng</label>
+                        <div class="user-inline-entry">
+                            <input id="currentMedicineInput" type="text" placeholder="VD: Paracetamol, Metformin...">
+                            <button class="user-secondary-button" type="button" id="btnAddCurrentMedicine">+</button>
+                        </div>
+                    </div>
+                    <div id="currentMedicineList" class="user-chip-list"></div>
+                </section>
+
+                <section class="user-form-section">
+                    <h2 class="user-section-title">Dị ứng thuốc</h2>
+                    <p class="user-section-subtitle">Thông tin này sẽ được lưu cùng phiên tra cứu để bạn dễ theo dõi về sau.</p>
+                    <div class="user-inline-entry">
+                        <input id="allergyInput" type="text" placeholder="VD: Penicillin, Sulfa...">
+                        <button class="user-secondary-button" type="button" id="btnAddAllergy">+</button>
+                    </div>
+                    <div id="allergyList" class="user-chip-list" style="margin-top:10px;"></div>
+                </section>
+
+                <section class="user-form-section">
+                    <h2 class="user-section-title">Triệu chứng đi kèm</h2>
+                    <div class="input-group">
+                        <label for="symptoms">Nhập triệu chứng hiện tại <span style="color:#e95d6a">*</span></label>
+                        <textarea id="symptoms"
+                                  name="symptoms"
+                                  rows="6"
+                                  placeholder="Ví dụ: sốt, ho, đau đầu, chóng mặt..."
+                                  required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Dự đoán</button>
+                </section>
+            </form>
+        </div>
+
+        <div class="user-column">
+            <div class="user-empty-card">
+                <div>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 2H8a2 2 0 0 0-2 2v13a1 1 0 0 0 1.45.89L12 15.62l4.55 2.27A1 1 0 0 0 18 17V4h1a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    <h3>Nhập bệnh để bắt đầu</h3>
+                    <p>Điền tên bệnh, chọn mức độ triệu chứng, thêm thông tin y tế liên quan rồi nhấn "Dự đoán".</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/dudoan/NhapThongTinBenh.js" asp-append-version="true"></script>
+}

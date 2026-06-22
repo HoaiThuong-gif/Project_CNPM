@@ -1,0 +1,55 @@
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Bảng quản trị";
+    var sectionTitle = ViewData["AdminSection"]?.ToString() ?? pageTitle;
+    var adminName = User.Identity?.Name;
+    if (string.IsNullOrWhiteSpace(adminName))
+    {
+        adminName = "Quản trị viên";
+    }
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@pageTitle | MedPredict Admin</title>
+    <link rel="stylesheet" href="~/css/admin/AdminPortal.css" asp-append-version="true">
+    @RenderSection("Styles", required: false)
+</head>
+<body class="admin-portal-body">
+    <div class="admin-shell">
+        @await Html.PartialAsync("_SidebarAdmin")
+
+        <div class="admin-content-shell">
+            <header class="admin-topbar">
+                <div class="admin-breadcrumb">@sectionTitle</div>
+
+                <div class="admin-topbar-actions">
+                    <button class="admin-icon-button" type="button" aria-label="Thông báo">
+                        <span class="admin-notification-dot"></span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3a4 4 0 0 0-4 4v1.1a7 7 0 0 1-1.53 4.37L5 14.25V16h14v-1.75l-1.47-1.78A7 7 0 0 1 16 8.1V7a4 4 0 0 0-4-4Zm0 18a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 21Z" fill="currentColor" />
+                        </svg>
+                    </button>
+
+                    <div class="admin-user-pill">
+                        <span class="admin-user-avatar">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span>@adminName</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="admin-main-frame">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/js/shared/Auth.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

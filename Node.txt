@@ -1,0 +1,187 @@
++ Thiết kế form nhập thông tin bệnh 
++ Thiết kế trang kết quả dự đoán 
++ Thiết kế dashboard admin
+ + Thiết kế giao diện đăng nhập
+ + Vẽ wireframe trang chủ 
++ Vẽ wireframe form nhập bệnh
+ + Code giao diện trang chủ 
++ Code form nhập liệu 
++ Code trang kết quả dự đoán 
++ Code dashboard admin 
++ Thiết kế giao diện
+
+1. Thiết kế form nhập thông tin bệnh
+→ Phần này nằm trong thư mục:
+
+NhapThongTinBenh/
+- NhapThongTinBenh.html
+- NhapThongTinBenh.css
+- NhapThongTinBenh.js
+
+==================================================
+
+2. Thiết kế trang kết quả dự đoán
+→ Phần này nằm trong thư mục:
+
+KetQuaDuDoan/
+- KetQuaDuDoan.html
+- KetQuaDuDoan.css
+- KetQuaDuDoan.js
+
+==================================================
+
+3. Thiết kế dashboard admin
+→ Phần này nằm trong thư mục:
+
+DashboardAdmin/
+- DashboardAdmin.html
+- DashboardAdmin.css
+- DashboardAdmin.js
+
+==================================================
+
+4. Thiết kế giao diện đăng nhập
+→ Phần này nằm trong thư mục:
+
+DangNhap/
+- DangNhap.html
+- DangNhap.css
+- DangNhap.js
+
+==================================================
+
+5. Vẽ wireframe trang chủ
+→ Phần này nằm trong thư mục:
+
+Wireframe/
+- WireframeTrangChu.html
+
+==================================================
+
+6. Vẽ wireframe form nhập bệnh
+→ Phần này nằm trong thư mục:
+
+Wireframe/
+- WireframeFormBenh.html
+
+==================================================
+
+7. Code giao diện trang chủ
+→ Phần này nằm trong thư mục:
+
+TrangChu/
+- TrangChu.html
+- TrangChu.css
+- TrangChu.js
+
+==================================================
+
+8. Code form nhập liệu
+→ Phần này nằm trong thư mục:
+
+NhapThongTinBenh/
+- NhapThongTinBenh.html
+- NhapThongTinBenh.css
+- NhapThongTinBenh.js
+
+==================================================
+
+9. Code trang kết quả dự đoán
+→ Phần này nằm trong thư mục:
+
+KetQuaDuDoan/
+- KetQuaDuDoan.html
+- KetQuaDuDoan.css
+- KetQuaDuDoan.js
+
+==================================================
+
+10. Code dashboard admin
+→ Phần này nằm trong thư mục:
+
+DashboardAdmin/
+- DashboardAdmin.html
+- DashboardAdmin.css
+- DashboardAdmin.js
+
+==================================================
+
+11. Thiết kế giao diện tổng thể website
+→ Bao gồm toàn bộ các thư mục giao diện:
+
+- TrangChu/
+- DangNhap/
+- DangKy/
+- DashboardAdmin/
+- NhapThongTinBenh/
+- KetQuaDuDoan/
+- QuanLyBenh/
+- QuanLyThuoc/
+- QuanLyNguoiDung/
+- QuanLyTrieuChung/
+- QuanLyDiUng/
+- ThongKe/
+- LichSuTraCuu/
+- ChiTietThuoc/
+
+==================================================
+
+12. Thành phần giao diện dùng lại
+→ Phần này nằm trong thư mục:
+
+ThanhPhanDungLai/
+- Header.html
+- Footer.html
+- Navbar.html
+- SidebarAdmin.html
+- CanhBaoYTe.html
+- ModalXoa.html
+- Loading.html
+
+==================================================
+
+13. CSS dùng chung cho toàn website
+→ Phần này nằm trong thư mục:
+
+TaiNguyen/CSS/
+- Reset.css
+- BienMau.css
+- GiaoDienChung.css
+- Responsive.css
+- Animation.css
+
+==================================================
+
+14. JavaScript dùng chung cho toàn website
+→ Phần này nằm trong thư mục:
+
+TaiNguyen/JS/
+- App.js
+- KiemTraForm.js
+- ThongBao.js
+- Modal.js
+- MenuAdmin.js
+
+==================================================
+
+15. Các trang lỗi hệ thống
+→ Phần này nằm trong thư mục:
+
+Loi/
+- 403.html
+- 404.html
+- 500.html
+
+==================================================
+
+16. File mô tả dự án
+→ File:
+
+README.md
+
+==================================================
+
+17. Cấu hình VS Code
+→ Thư mục:
+
+.vscode/

@@ -1,0 +1,76 @@
+@{
+    Layout = "~/Views/Shared/_UserPortalLayout.cshtml";
+    ViewData["Title"] = "Tổng quan";
+    ViewData["UserSection"] = "Tổng quan";
+}
+
+<section class="user-dashboard"
+         data-history-url="/api/UserPrediction/history"
+         data-login-url="@Url.Action("DangNhap", "Account")"
+         data-disease-count="@ViewBag.ActiveDiseaseCount"
+         data-medicine-count="@ViewBag.ActiveMedicineCount">
+    <div class="user-page-header">
+        <div>
+            <h1 class="user-page-title">Tổng quan</h1>
+            <p class="user-page-subtitle">Thống kê hoạt động cá nhân và dữ liệu hệ thống.</p>
+        </div>
+    </div>
+
+    <section class="user-stats-grid">
+        <article class="user-stat-card">
+            <div class="user-stat-icon is-blue">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-3.17A3 3 0 0 0 13 2h-2a3 3 0 0 0-2.83 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM12 4a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1Zm3 9h-2v2h-2v-2H9v-2h2V9h2v2h2Z" fill="currentColor" /></svg>
+            </div>
+            <strong id="overviewDiseaseCount">@ViewBag.ActiveDiseaseCount</strong>
+            <span>Bệnh trong CSDL</span>
+        </article>
+
+        <article class="user-stat-card">
+            <div class="user-stat-icon is-green">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.12 5.88 18.24 10 10 18.24 5.88 14.12Zm0-2.83a2 2 0 0 1 2.83 0L21.07 7.17a2 2 0 0 1 0 2.83l-1.41 1.41-6.95-6.95Z" fill="currentColor" /></svg>
+            </div>
+            <strong id="overviewMedicineCount">@ViewBag.ActiveMedicineCount</strong>
+            <span>Thuốc được lưu trữ</span>
+        </article>
+
+        <article class="user-stat-card">
+            <div class="user-stat-icon is-amber">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6Zm7 0v7h-7l2.79-2.79A8 8 0 0 1 18 2Z" fill="currentColor" /></svg>
+            </div>
+            <strong id="overviewHistoryCount">--</strong>
+            <span>Tra cứu đã lưu</span>
+        </article>
+
+        <article class="user-stat-card">
+            <div class="user-stat-icon is-red">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V5Zm0 5a1.25 1.25 0 1 1-1.25 1.25A1.25 1.25 0 0 1 12 7Zm2 9h-4v-1.5h1.25v-3H10V10h3v4.5H14Z" fill="currentColor" /></svg>
+            </div>
+            <strong id="overviewLatestMedicineCount">--</strong>
+            <span>Thuốc ở lần dự đoán gần nhất</span>
+        </article>
+    </section>
+
+    <section class="user-dashboard-grid">
+        <article class="user-panel">
+            <div class="user-panel-header">
+                <h2>Bệnh tra cứu nhiều nhất</h2>
+            </div>
+            <div id="overviewTopDiseases" class="user-rank-list">
+                <div class="user-empty-state">Đang tải dữ liệu...</div>
+            </div>
+        </article>
+
+        <article class="user-panel">
+            <div class="user-panel-header">
+                <h2>Hoạt động gần đây</h2>
+            </div>
+            <div id="overviewRecentActivity" class="user-activity-list">
+                <div class="user-empty-state">Đang tải dữ liệu...</div>
+            </div>
+        </article>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="~/js/dudoan/TongQuan.js" asp-append-version="true"></script>
+}

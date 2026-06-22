@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Project_CNPM.Area.Admin.Controllers
 {
+    [Area("Admin")]
     [ApiController]
     [Route("api/[Controller]")]
     [Authorize(Roles="Admin")]

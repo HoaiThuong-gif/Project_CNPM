@@ -1,0 +1,46 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý người dùng";
+    ViewData["AdminSection"] = "Quản lý người dùng";
+}
+
+<section class="admin-page-shell main"
+         data-users-api="/api/User"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">Quản lý người dùng</p>
+            <h1 class="admin-page-title">Quản lý người dùng</h1>
+            <p class="admin-page-subtitle">Theo dõi tài khoản bệnh nhân và quản trị viên bằng dữ liệu thực tế.</p>
+        </div>
+    </div>
+
+    <section class="table-wrapper">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc email...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="userTable">
+                <tr>
+                    <td colspan="7">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="~/js/admin/QuanLyNguoiDung.js" asp-append-version="true"></script>
+}

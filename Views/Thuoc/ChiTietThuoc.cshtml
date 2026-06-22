@@ -1,0 +1,85 @@
+@model Project_CNPM.Area.Admin.DTOs.MedicineDetailDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết thuốc | MedPredict</title>
+    <link rel="stylesheet" href="~/css/shared/PublicPortal.css" asp-append-version="true">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-aside">
+            <div class="portal-aside-content">
+                <div class="portal-brand">
+                    <span class="portal-brand-badge"></span>
+                    <span>MedPredict</span>
+                </div>
+
+                <h1 class="portal-title">@Model.MedicineName</h1>
+                <p class="portal-description">
+                    @(string.IsNullOrWhiteSpace(Model.Uses) ? "Chưa có mô tả công dụng cho thuốc này trong hệ thống." : Model.Uses)
+                </p>
+
+                <div class="portal-feature-list">
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Hoạt chất: @(string.IsNullOrWhiteSpace(Model.ActiveIngredient) ? "Chưa có dữ liệu" : Model.ActiveIngredient)</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Nhóm thuốc: @(string.IsNullOrWhiteSpace(Model.MedicineGroup) ? "Chưa có dữ liệu" : Model.MedicineGroup)</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Liều dùng: @(string.IsNullOrWhiteSpace(Model.Dosage) ? "Chưa có dữ liệu" : Model.Dosage)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-footer-note">© 2026 MedPredict · Phiên bản học tập</div>
+        </aside>
+
+        <main class="portal-main">
+            <div class="portal-main-inner">
+                <a class="portal-top-link" asp-controller="Thuoc" asp-action="DanhSachThuoc">← Quay lại danh sách thuốc</a>
+
+                <section class="portal-card">
+                    <h2 class="portal-card-title">Thông tin chi tiết</h2>
+                    <p class="portal-card-subtitle">Dữ liệu hiển thị lấy từ service thuốc đang dùng trong dự án.</p>
+
+                    <div class="portal-stat-grid">
+                        <div class="portal-stat-card">
+                            <strong>Hoạt chất</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.ActiveIngredient) ? "Chưa có dữ liệu." : Model.ActiveIngredient)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Nhóm thuốc</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.MedicineGroup) ? "Chưa có dữ liệu." : Model.MedicineGroup)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Liều dùng</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.Dosage) ? "Chưa có dữ liệu." : Model.Dosage)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Cách dùng</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.HowToUse) ? "Chưa có dữ liệu." : Model.HowToUse)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Tác dụng phụ</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.SideEffects) ? "Chưa có dữ liệu." : Model.SideEffects)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Lưu ý</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.Notes) ? "Chưa có dữ liệu." : Model.Notes)</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

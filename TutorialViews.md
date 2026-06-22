@@ -1,120 +1,189 @@
 # Tutorial Views
 
-## 1. Phân hệ Authentication
+Tài liệu này mô tả luồng MVC/view đang dùng thực tế trong repo hiện tại. Chỉ ghi các màn hình và API đã có trong code, tránh giả định thêm route hoặc endpoint mới.
 
-Phân hệ xác thực dùng chung cho cả User và Admin.
+## 1. Authentication
 
-### V-01: Login View
+### V-01: Đăng nhập
 
-Mục tiêu:
+View:
 
-- Hiển thị form nhập email và mật khẩu.
-- Gọi `POST /api/Auth/login`.
-- Lưu JWT token vào `localStorage` hoặc cơ chế lưu token tương đương.
-- Điều hướng theo role nhận được trong JWT.
+- `GET /Account/DangNhap`
+- File view: `Views/Account/DangNhap.cshtml`
 
-Điều hướng:
+API gọi từ frontend:
 
-- Role `Admin`: chuyển vào phân hệ Admin.
-- Role `User`: chuyển vào phân hệ User.
+- `POST /api/Auth/login`
 
-### V-02: Register View
+Kết quả:
 
-Mục tiêu:
+- Lưu JWT ở `localStorage`.
+- Lưu `username`, `role`, `userId` để dùng lại ở layout/frontend.
+- Nếu role là `Admin`, chuyển sang `GET /Admin/Dashboard`.
+- Nếu role là `User`, chuyển sang `GET /DuDoan/NhapThongTinBenh`.
+- Nếu có `returnUrl` hợp lệ thì ưu tiên quay lại đúng trang trước đó.
 
-- Hiển thị form nhập họ tên, email, mật khẩu và xác nhận mật khẩu.
-- Gọi `POST /api/Auth/register`.
+### V-02: Đăng ký
+
+View:
+
+- `GET /Account/DangKy`
+- File view: `Views/Account/DangKy.cshtml`
+
+API gọi từ frontend:
+
+- `POST /api/Auth/register`
+
+Kết quả:
+
 - Hiển thị thông báo thành công hoặc lỗi từ backend.
-
-Workflow xác thực:
-
-```text
-Khách truy cập
-  -> V-01 Login
-  -> Đăng nhập thành công
-  -> Điều hướng theo role
-```
+- Không tự thay đổi logic xác thực phía server.
 
 ## 2. Phân hệ User
 
-Phân hệ User dùng layout chung có header, nút đăng xuất và lối vào trang lịch sử.
+Layout chung:
 
-### V-03: Prediction Input View
+- `Views/Shared/_UserPortalLayout.cshtml`
 
-Mục tiêu:
+Sidebar user hiện có 3 lối vào:
 
-- Là màn hình bắt đầu cho người dùng.
-- Có dropdown chọn bệnh từ API `GET /api/Disease`.
-- Có textarea lớn để nhập mô tả triệu chứng tự do.
-- Gọi `POST /api/UserPrediction/predict`.
+- `GET /DuDoan/NhapThongTinBenh`
+- `GET /DuDoan/LichSuTraCuu`
+- `GET /DuDoan/TongQuan`
 
-Dữ liệu gửi:
+### V-03: Nhập thông tin dự đoán
 
-- `DiseaseId`: mã bệnh được chọn.
-- `Symptoms`: mô tả triệu chứng người dùng nhập.
+View:
 
-### V-04: Prediction Result View
+- `GET /DuDoan/NhapThongTinBenh`
+- File view: `Views/DuDoan/NhapThongTinBenh.cshtml`
 
-Mục tiêu:
+API dùng thật:
 
-- Nhận JSON trả về từ V-03.
-- Hiển thị danh sách thuốc gợi ý.
-- Hiển thị tên thuốc, liều dùng, điểm số và lý do gợi ý.
-- Làm nổi bật cảnh báo nếu có dữ liệu trong `AllergyWarnings`, `DiseaseWarnings` hoặc `DrugInteractions`.
-- Có nút feedback cho từng kết quả.
+- `GET /api/Disease`
+- `POST /api/UserPrediction/predict`
+
+Thông tin người dùng có thể nhập ở frontend hiện tại:
+
+- Bệnh cần dự đoán.
+- Tuổi.
+- Giới tính.
+- Mức độ triệu chứng.
+- Bệnh nền.
+- Thuốc đang sử dụng.
+- Dị ứng thuốc.
+- Triệu chứng tự do.
+
+Ghi chú triển khai:
+
+- Backend hiện vẫn nhận DTO cũ gồm `diseaseId` và `symptoms`.
+- Frontend sẽ ghép các thông tin bổ sung thành một chuỗi `symptoms` giàu ngữ cảnh trước khi gọi API.
+- Không có thay đổi schema request ở backend.
+
+### V-04: Kết quả dự đoán
+
+View:
+
+- `GET /DuDoan/KetQuaDuDoan`
+- File view: `Views/DuDoan/KetQuaDuDoan.cshtml`
+
+Nguồn dữ liệu:
+
+- Đọc từ `sessionStorage` sau khi V-03 gọi dự đoán thành công.
+
+Hiển thị:
+
+- Tóm tắt thông tin đầu vào.
+- Danh sách thuốc gợi ý.
+- Điểm phù hợp.
+- Lý do gợi ý.
+- Liều dùng tham khảo.
+- Cảnh báo dị ứng, bệnh nền, tương tác thuốc nếu backend trả về.
+- Nút xem chi tiết thuốc đến `GET /Thuoc/ChiTietThuoc/{id}`.
+- Nút feedback cho từng kết quả.
 
 API feedback:
 
 - `POST /api/UserPrediction/feedback`
 
-Dữ liệu feedback:
+### V-05: Lịch sử tra cứu
 
-- `ResultId`: lấy từ kết quả dự đoán.
-- `IsHelpful`: hữu ích hoặc không hữu ích.
-- `Note`: ghi chú tùy chọn.
+View:
 
-### V-05: User History View
+- `GET /DuDoan/LichSuTraCuu`
+- File view: `Views/DuDoan/LichSuTraCuu.cshtml`
 
-Mục tiêu:
+API dùng thật:
 
-- Hiển thị lịch sử tra cứu dạng bảng hoặc danh sách card.
-- Gọi `GET /api/UserPrediction/history`.
-- Mỗi dòng có nút xóa lịch sử.
-- Gọi `DELETE /api/UserPrediction/history/{historyId}` khi người dùng xóa.
+- `GET /api/UserPrediction/history`
+- `DELETE /api/UserPrediction/history/{historyId}`
 
-Workflow User:
+Trạng thái frontend hiện tại:
 
-```text
-V-03 Nhập bệnh và triệu chứng
-  -> Gửi AI xử lý
-  -> V-04 Xem kết quả và cảnh báo
-  -> Gửi feedback nếu muốn
+- Tìm kiếm theo bệnh, thông tin triệu chứng hoặc thuốc.
+- Xóa từng lịch sử.
+- Xóa nhiều lịch sử đã chọn bằng cách gọi nhiều request `DELETE` tuần tự.
+- Chưa có endpoint chi tiết riêng cho một bản ghi lịch sử.
 
-Header
-  -> V-05 Xem lịch sử
-  -> Xóa lịch sử nếu muốn
-```
+### V-06: Tổng quan người dùng
+
+View:
+
+- `GET /DuDoan/TongQuan`
+- File view: `Views/DuDoan/TongQuan.cshtml`
+
+Nguồn dữ liệu:
+
+- `GET /api/UserPrediction/history`
+- Số bệnh đang hoạt động và số thuốc đang hoạt động được lấy từ MVC controller `DuDoanController`.
+
+Hiển thị:
+
+- Số bệnh đang hoạt động.
+- Số thuốc đang hoạt động.
+- Số lịch sử tra cứu của tài khoản hiện tại.
+- Số thuốc ở lần dự đoán gần nhất.
+- Bệnh tra cứu nhiều nhất.
+- Hoạt động gần đây.
 
 ## 3. Phân hệ Admin
 
-Phân hệ Admin dùng layout riêng, có sidebar cố định bên trái để điều hướng giữa các màn hình quản trị.
+Layout chung:
 
-### V-06: Dashboard View
+- `Areas/Admin/Views/Shared/_Layout.cshtml`
 
-Mục tiêu:
+Controller MVC điều hướng:
 
-- Hiển thị 4 thẻ thống kê tổng quan: users, thuốc, bệnh và lượt dự đoán.
-- Gọi `GET /api/admin/Dashboard/statistics`.
+- `Areas/Admin/Controllers/PortalController.cs`
 
-### V-07: Medicine Management View
+Các route view hiện có:
 
-Mục tiêu:
+- `GET /Admin`
+- `GET /Admin/Dashboard`
+- `GET /Admin/QuanLyThuoc`
+- `GET /Admin/QuanLyBenh`
+- `GET /Admin/QuanLyTrieuChung`
+- `GET /Admin/QuanLyNguoiDung`
+- `GET /Admin/QuanLyDiUng`
+- `GET /Admin/ThongKe`
 
-- Hiển thị bảng danh sách thuốc.
-- Có chức năng thêm mới, sửa và bật/tắt trạng thái.
-- Dùng modal hoặc form panel để nhập chi tiết thuốc.
+### V-07: Dashboard admin
 
-API chính:
+View:
+
+- `Areas/Admin/Views/Dashboard/Dashboard.cshtml`
+
+API:
+
+- `GET /api/admin/Dashboard/statistics`
+
+### V-08: Quản lý thuốc
+
+View:
+
+- `Areas/Admin/Views/Medicine/QuanLyThuoc.cshtml`
+
+API:
 
 - `GET /api/Medicine`
 - `GET /api/Medicine/{id}`
@@ -122,15 +191,13 @@ API chính:
 - `PATCH /api/Medicine/update`
 - `PATCH /api/Medicine/toggle?id={id}&isActive={true|false}`
 
-### V-08: Disease Management View
+### V-09: Quản lý bệnh
 
-Mục tiêu:
+View:
 
-- Hiển thị bảng danh sách bệnh.
-- Có chức năng thêm mới, sửa và bật/tắt trạng thái.
-- Dùng modal hoặc form panel để nhập thông tin bệnh.
+- `Areas/Admin/Views/Disease/QuanLyBenh.cshtml`
 
-API chính:
+API:
 
 - `GET /api/Disease`
 - `GET /api/Disease/{id}`
@@ -138,15 +205,13 @@ API chính:
 - `PATCH /api/Disease/Update`
 - `PATCH /api/Disease/toggle?id={id}`
 
-### V-09: Symptom Management View
+### V-10: Quản lý triệu chứng
 
-Mục tiêu:
+View:
 
-- Hiển thị bảng danh sách triệu chứng.
-- Có chức năng thêm mới, sửa và bật/tắt trạng thái.
-- Dùng modal hoặc form panel tương tự bệnh và thuốc.
+- `Areas/Admin/Views/Symptom/QuanLyTrieuChung.cshtml`
 
-API chính:
+API:
 
 - `GET /api/Symptom`
 - `GET /api/Symptom/{id}`
@@ -154,120 +219,59 @@ API chính:
 - `PATCH /api/Symptom/update`
 - `PATCH /api/Symptom/toggle?id={id}`
 
-### V-10: Medicine-Disease Mapping View
+### V-11: Quản lý cảnh báo an toàn
 
-Mục tiêu:
+View:
 
-- Cho admin chọn một bệnh từ dropdown.
-- Hiển thị danh sách thuốc đang được liên kết với bệnh đó.
-- Cho phép link thêm thuốc mới vào bệnh.
-- Cho phép thiết lập `Priority` và `TreatmentType`.
-- Cho phép unlink thuốc khỏi bệnh.
+- `Areas/Admin/Views/SafetyWarning/QuanLyDiUng.cshtml`
 
-API chính:
-
-- `GET /api/admin/MedicineDiseaseMapping/disease/{diseaseId}/medicines`
-- `GET /api/admin/MedicineDiseaseMapping/medicine/{medicineId}/diseases`
-- `POST /api/admin/MedicineDiseaseMapping/link`
-- `DELETE /api/admin/MedicineDiseaseMapping/unlink/medicine/{medicineId}/disease/{diseaseId}`
-
-Ghi chú:
-
-- Màn hình này ảnh hưởng trực tiếp tới vector store của AI service vì backend sẽ đồng bộ dữ liệu sang Flask khi link hoặc unlink.
-
-### V-11: Safety Warnings View
-
-Mục tiêu:
-
-- Quản lý dữ liệu cảnh báo an toàn cho thuốc.
-- Chia thành 3 tab: dị ứng, bệnh nền và tương tác thuốc.
-
-Tab dị ứng:
+API:
 
 - `GET /api/SafetyWarning/allergies`
 - `POST /api/SafetyWarning/allergies/create`
 - `PATCH /api/SafetyWarning/allergies/update`
 - `PATCH /api/SafetyWarning/allergies/toggle?id={id}&isActive={true|false}`
-
-Tab bệnh nền:
-
 - `GET /api/SafetyWarning/background-diseases`
 - `POST /api/SafetyWarning/background-diseases/create`
 - `PATCH /api/SafetyWarning/background-diseases/update`
 - `PATCH /api/SafetyWarning/background-diseases/toggle?id={id}&isActive={true|false}`
-
-Tab tương tác thuốc:
-
 - `GET /api/SafetyWarning/drug-interactions`
 - `POST /api/SafetyWarning/drug-interactions/create`
 - `DELETE /api/SafetyWarning/drug-interactions/{medicine1Id}/{medicine2Id}`
 
-Gợi ý UI:
+### V-12: Quản lý người dùng
 
-- Tab tương tác thuốc cần 2 dropdown chọn thuốc A và thuốc B.
-- Khi hiển thị tương tác, nên hiển thị cả hai tên thuốc và mô tả mức độ/cảnh báo.
+View:
 
-### V-12: User Admin View
+- `Areas/Admin/Views/UserAdmin/QuanLyNguoiDung.cshtml`
 
-Mục tiêu:
-
-- Hiển thị bảng người dùng.
-- Có cột trạng thái khóa tài khoản.
-- Có nút khóa/mở khóa.
-- Có nút xóa tài khoản.
-
-API chính:
+API:
 
 - `GET /api/User`
 - `PATCH /api/User/{userId}/lock?isLocked={true|false}`
 - `DELETE /api/User/{userId}`
 
-Workflow Admin:
+### V-13: Thống kê admin
 
-```text
-Sidebar
-  -> Chọn màn hình V-06 đến V-12
-  -> Xem danh sách dữ liệu
-  -> Thêm, sửa, bật/tắt, khóa hoặc xóa
-  -> Gửi API
-  -> Đóng modal/form
-  -> Reload lại bảng
-```
+View:
 
-## 4. Gợi ý UI/UX frontend
+- `Areas/Admin/Views/SafetyWarning/ThongKe.cshtml`
 
-### Xử lý token
+API:
 
-- Tạo một lớp HTTP client dùng chung, ví dụ `axios_interceptor.js`.
-- Tự động gắn `Authorization: Bearer <token>` vào request cần xác thực.
-- Nếu API trả `401 Unauthorized`, xóa token và chuyển người dùng về V-01 Login.
+- Hiện đang dùng dữ liệu thống kê tổng hợp từ backend admin và dữ liệu hiện có ở frontend.
 
-### Thông báo
+## 4. Quy ước frontend đang áp dụng
 
-- Dùng toast hoặc dialog nhẹ để hiển thị `message` từ backend.
-- Thông báo nên xuất hiện sau các hành động: đăng nhập, đăng ký, thêm, sửa, bật/tắt, xóa, gửi feedback.
+- Route nội bộ Razor ưu tiên `asp-controller`, `asp-action`, `Url.Action`.
+- File JS ngoài không dùng Razor trực tiếp, chỉ nhận URL qua `data-*`.
+- Các request cần xác thực dùng JWT từ `localStorage`.
+- Khi gặp `401`, frontend xóa trạng thái cũ nếu cần và chuyển người dùng về trang đăng nhập.
+- Form dự đoán và các thao tác xóa/feedback có trạng thái đang xử lý ở phía client.
 
-### Trạng thái tải và lỗi
+## 5. Những gì cố ý chưa thêm
 
-- Mỗi bảng nên có trạng thái loading.
-- Form nên disable nút submit trong lúc gửi API.
-- Khi API lỗi, hiển thị thông báo rõ ràng và giữ lại dữ liệu người dùng đã nhập nếu có thể.
-
-### Bố cục dữ liệu
-
-- Các màn hình quản trị nên ưu tiên bảng dữ liệu dễ scan.
-- Các form thêm/sửa nên tái sử dụng cùng một modal hoặc form panel.
-- Các hành động nguy hiểm như xóa lịch sử, xóa người dùng hoặc unlink thuốc-bệnh nên có bước xác nhận.
-
-## 5. Thứ tự triển khai gợi ý
-
-1. V-01 Login và xử lý token.
-2. V-02 Register.
-3. Layout User và V-03 Prediction Input.
-4. V-04 Prediction Result và feedback.
-5. V-05 User History.
-6. Layout Admin và V-06 Dashboard.
-7. V-07, V-08, V-09 cho dữ liệu danh mục.
-8. V-10 Mapping thuốc-bệnh.
-9. V-11 Safety Warnings.
-10. V-12 User Admin.
+- Không thay DTO hoặc schema API backend.
+- Không đổi service, model, DbContext hoặc logic AI/Flask.
+- Không thêm endpoint chi tiết lịch sử vì backend hiện chưa có.
+- Không tự suy diễn thêm màn hình ngoài các route đang tồn tại trong repo.

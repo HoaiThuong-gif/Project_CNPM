@@ -1,0 +1,84 @@
+@{
+    Layout = null;
+    var activeDiseaseCount = ViewBag.ActiveDiseaseCount ?? 0;
+    var activeMedicineCount = ViewBag.ActiveMedicineCount ?? 0;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ | MedPredict</title>
+    <link rel="stylesheet" href="~/css/shared/PublicPortal.css" asp-append-version="true">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-aside">
+            <div class="portal-aside-content">
+                <div class="portal-brand">
+                    <span class="portal-brand-badge"></span>
+                    <span>MedPredict</span>
+                </div>
+
+                <h1 class="portal-title">Hệ thống dự đoán thuốc thông minh</h1>
+                <p class="portal-description">
+                    Nhập bệnh, gửi thông tin sức khỏe và nhận danh sách thuốc gợi ý theo dữ liệu đang hoạt động trong hệ thống. Luồng public và đăng nhập được tách rõ ràng để dễ sử dụng.
+                </p>
+
+                <div class="portal-feature-list">
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>@activeDiseaseCount bệnh đang hoạt động trong hệ thống</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>@activeMedicineCount thuốc đang hoạt động để tra cứu</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Dashboard admin riêng cho tài khoản quản trị</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-footer-note">© 2026 MedPredict · Phiên bản học tập</div>
+        </aside>
+
+        <main class="portal-main">
+            <div class="portal-main-inner">
+                <div class="portal-alert">
+                    Kết quả gợi ý thuốc chỉ mang tính tham khảo, không thay thế tư vấn từ bác sĩ hoặc dược sĩ có chuyên môn.
+                </div>
+
+                <div class="portal-tabs">
+                    <a class="portal-tab is-active" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                    <a class="portal-tab" asp-controller="Account" asp-action="DangNhap">Đăng nhập</a>
+                </div>
+
+                <section class="portal-card">
+                    <h2 class="portal-card-title">Bắt đầu nhanh</h2>
+                    <p class="portal-card-subtitle">Chọn lối vào phù hợp với nhu cầu hiện tại của bạn.</p>
+
+                    <div class="portal-grid-links">
+                        <a class="portal-button portal-button-primary" asp-controller="Account" asp-action="DangNhap">Đăng nhập hệ thống</a>
+                        <a class="portal-button portal-button-secondary" asp-controller="Account" asp-action="DangKy">Đăng ký tài khoản</a>
+                        <a class="portal-button portal-button-secondary" asp-controller="Thuoc" asp-action="DanhSachThuoc">Xem danh sách thuốc</a>
+                        <a class="portal-button portal-button-secondary" asp-controller="Account" asp-action="DangNhap" asp-route-returnUrl="@Url.Action("NhapThongTinBenh", "DuDoan")">Vào khu dự đoán</a>
+                    </div>
+
+                    <div class="portal-stat-grid">
+                        <div class="portal-stat-card">
+                            <strong>@activeDiseaseCount</strong>
+                            <span>Bệnh đang hoạt động</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>@activeMedicineCount</strong>
+                            <span>Thuốc đang hoạt động</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

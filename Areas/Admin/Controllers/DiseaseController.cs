@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Project_CNPM.Area.Admin.Controllers
 {
+    [Area("Admin")]
     [ApiController]
     [Route("api/[Controller]")]
-    [Authorize(Roles="Admin")]
+    [Authorize]
     public class DiseaseController : ControllerBase
     {
         private readonly IDiseaseAdminService _diseaseAdminService;
@@ -37,6 +38,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(diseases);
         }
 
+        [Authorize(Roles="Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateDisease([FromBody] DiseaseCreateDto disease)
         {
@@ -48,6 +50,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new {message = result.Message});
         }
 
+        [Authorize(Roles="Admin")]
         [HttpPatch("Update")]
         public async Task<IActionResult> UpdateDisease([FromBody] DiseaseUpdateDto disease)
         {
@@ -59,6 +62,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new {message = result.Message});
         }
 
+        [Authorize(Roles="Admin")]
         [HttpPatch("toggle")]
         public async Task<IActionResult> DeleteDisease(int id)
         {

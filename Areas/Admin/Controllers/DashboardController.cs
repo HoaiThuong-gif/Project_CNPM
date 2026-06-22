@@ -4,6 +4,7 @@ using Project_CNPM.Area.Admin.Services;
 
 namespace Project_CNPM.Area.Admin.Controllers
 {
+    [Area("Admin")]
     [ApiController]
     [Route("api/admin/[controller]")]
     [Authorize(Roles="Admin")]

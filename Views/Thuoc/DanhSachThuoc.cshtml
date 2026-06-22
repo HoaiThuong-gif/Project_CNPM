@@ -1,0 +1,87 @@
+@model IEnumerable<Project_CNPM.Area.Admin.DTOs.MedicineDetailDto>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách thuốc | MedPredict</title>
+    <link rel="stylesheet" href="~/css/shared/PublicPortal.css" asp-append-version="true">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-aside">
+            <div class="portal-aside-content">
+                <div class="portal-brand">
+                    <span class="portal-brand-badge"></span>
+                    <span>MedPredict</span>
+                </div>
+
+                <h1 class="portal-title">Kho dữ liệu thuốc đang hoạt động</h1>
+                <p class="portal-description">
+                    Danh sách dưới đây được lấy trực tiếp từ backend qua service hiện có, phù hợp cho người dùng chưa đăng nhập xem và tra cứu thông tin công khai.
+                </p>
+
+                <div class="portal-feature-list">
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Chỉ hiển thị thuốc đang hoạt động</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Bấm vào từng thuốc để xem chi tiết</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Không yêu cầu đăng nhập để tra cứu công khai</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-footer-note">© 2026 MedPredict · Phiên bản học tập</div>
+        </aside>
+
+        <main class="portal-main">
+            <div class="portal-main-inner">
+                <div class="portal-tabs">
+                    <a class="portal-tab" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                    <a class="portal-tab is-active" asp-controller="Thuoc" asp-action="DanhSachThuoc">Thuốc</a>
+                </div>
+
+                <section class="portal-card">
+                    <h2 class="portal-card-title">Danh sách thuốc</h2>
+                    <p class="portal-card-subtitle">Tra cứu nhanh các thuốc hiện có trong hệ thống.</p>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="portal-alert" style="margin:0;background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;">
+                            Hiện chưa có thuốc đang hoạt động trong hệ thống.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="portal-medicine-list">
+                            @foreach (var medicine in Model)
+                            {
+                                <article class="portal-medicine-card">
+                                    <h3>@medicine.MedicineName</h3>
+                                    <p>@(string.IsNullOrWhiteSpace(medicine.Uses) ? "Chưa có mô tả công dụng." : medicine.Uses)</p>
+                                    <div class="portal-medicine-meta">
+                                        Hoạt chất: @(string.IsNullOrWhiteSpace(medicine.ActiveIngredient) ? "Chưa có dữ liệu" : medicine.ActiveIngredient)
+                                    </div>
+                                    <a class="portal-button portal-button-secondary"
+                                       asp-controller="Thuoc"
+                                       asp-action="ChiTietThuoc"
+                                       asp-route-id="@medicine.MedicineId">Xem chi tiết</a>
+                                </article>
+                            }
+                        </div>
+                    }
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+@{
+    Layout = "~/Views/Shared/_UserPortalLayout.cshtml";
+    ViewData["Title"] = "Lịch sử tra cứu";
+    ViewData["UserSection"] = "Lịch sử tra cứu";
+}
+
+<section class="history-container"
+         data-history-url="/api/UserPrediction/history"
+         data-login-url="@Url.Action("DangNhap", "Account")">
+    <div class="user-page-header">
+        <div>
+            <h1 class="user-page-title">Lịch sử tra cứu</h1>
+            <p class="user-page-subtitle">Các phiên dự đoán thuốc trước đây của tài khoản hiện tại.</p>
+        </div>
+    </div>
+
+    <div class="user-history-search">
+        <input type="text" id="historySearchInput" placeholder="Tìm theo bệnh, triệu chứng hoặc thuốc...">
+        <button id="btnHistorySearch" class="user-primary-button" type="button">Tìm kiếm</button>
+        <button id="btnDeleteSelectedHistory" class="user-secondary-button" type="button">Xóa mục đã chọn</button>
+    </div>
+
+    <section class="user-history-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <input id="selectAllHistory" type="checkbox" aria-label="Chọn tất cả">
+                    </th>
+                    <th>Bệnh</th>
+                    <th>Triệu chứng & thông tin</th>
+                    <th>Thuốc</th>
+                    <th>Thời gian</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="historyList">
+                <tr>
+                    <td colspan="6">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="~/js/dudoan/LichSuTraCuu.js" asp-append-version="true"></script>
+}

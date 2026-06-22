@@ -1,0 +1,94 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thống kê";
+    ViewData["AdminSection"] = "Thống kê";
+}
+
+<section class="admin-page-shell main"
+         data-statistics-url="/api/admin/Dashboard/statistics"
+         data-disease-api="/api/Disease"
+         data-medicine-api="/api/Medicine"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="page-title">
+        <h1>Thống kê hệ thống</h1>
+        <p>Tổng quan dữ liệu hoạt động của website và các chỉ số chính.</p>
+    </div>
+
+    <section class="card-grid">
+        <article class="stat-card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 1a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.31 0-6 1.79-6 4v1h8v-1a5.8 5.8 0 0 1 1.67-4A8.5 8.5 0 0 0 8 14Zm8 0c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="statsUsers">--</h2>
+            <span>Tổng người dùng</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.12 5.88 18.24 10 10 18.24 5.88 14.12Zm0-2.83a2 2 0 0 1 2.83 0L21.07 7.17a2 2 0 0 1 0 2.83l-1.41 1.41-6.95-6.95Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="statsMedicines">--</h2>
+            <span>Tổng thuốc hoạt động</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-3.17A3 3 0 0 0 13 2h-2a3 3 0 0 0-2.83 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM12 4a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1Zm3 9h-2v2h-2v-2H9v-2h2V9h2v2h2Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="statsDiseases">--</h2>
+            <span>Tổng bệnh hoạt động</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4Zm10 7h6V4h-6ZM4 20h6v-5H4Zm0-7h6v-2H4Zm10 7h6v-5h-6Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="statsPredictions">--</h2>
+            <span>Lượt tra cứu và dự đoán</span>
+        </article>
+    </section>
+
+    <section class="chart-section">
+        <div class="chart-box">
+            <h2>Tổng quan dữ liệu hoạt động</h2>
+            <div class="fake-chart">
+                <div class="bar bar1" id="barDiseases"></div>
+                <div class="bar bar2" id="barMedicines"></div>
+                <div class="bar bar3" id="barPredictions"></div>
+                <div class="bar bar4" id="barUsers"></div>
+                <div class="bar bar5"></div>
+                <div class="bar bar6"></div>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <h2>Tỷ lệ dữ liệu hoạt động</h2>
+            <div class="circle-chart" id="activityCircle">
+                <div class="circle-inner" id="activityCircleText">0%</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="table-section">
+        <div class="table-header">
+            <h2>Danh sách bệnh đang hoạt động</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên bệnh</th>
+                    <th>Nhóm</th>
+                    <th>Mức độ</th>
+                </tr>
+            </thead>
+            <tbody id="statsDiseaseTable">
+                <tr><td colspan="3">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="~/js/admin/ThongKe.js" asp-append-version="true"></script>
+}

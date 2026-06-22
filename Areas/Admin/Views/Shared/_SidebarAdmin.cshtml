@@ -1,0 +1,79 @@
+@{
+    var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty).ToLowerInvariant();
+    var adminName = User.Identity?.Name;
+    if (string.IsNullOrWhiteSpace(adminName))
+    {
+        adminName = "Quản trị viên";
+    }
+
+    string ActiveClass(string action) => currentAction == action.ToLowerInvariant() ? "admin-sidebar-link is-active" : "admin-sidebar-link";
+}
+
+<aside class="admin-sidebar">
+    <div class="admin-sidebar-brand">
+        <span class="admin-sidebar-brand-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 12.5 10.5 16 18 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <rect x="3" y="4" width="18" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+        </span>
+        <div class="admin-sidebar-brand-text">
+            <strong>MedPredict</strong>
+            <span>Bảng quản trị</span>
+        </div>
+    </div>
+
+    <div class="admin-sidebar-section-label">Chế độ quản trị</div>
+
+    <nav class="admin-sidebar-nav">
+        <a class="@ActiveClass("Dashboard")" asp-area="Admin" asp-controller="Portal" asp-action="Dashboard">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4Zm10 7h6V4h-6ZM4 20h6v-5H4Zm0-7h6v-2H4Zm10 7h6v-5h-6Z" fill="currentColor" /></svg>
+            <span>Dashboard</span>
+        </a>
+        <a class="@ActiveClass("QuanLyThuoc")" asp-area="Admin" asp-controller="Portal" asp-action="QuanLyThuoc">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.12 5.88 18.24 10 10 18.24 5.88 14.12Zm0-2.83a2 2 0 0 1 2.83 0L21.07 7.17a2 2 0 0 1 0 2.83l-1.41 1.41-6.95-6.95Z" fill="currentColor" /></svg>
+            <span>Quản lý thuốc</span>
+        </a>
+        <a class="@ActiveClass("QuanLyBenh")" asp-area="Admin" asp-controller="Portal" asp-action="QuanLyBenh">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-3.17A3 3 0 0 0 13 2h-2a3 3 0 0 0-2.83 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM12 4a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1Zm3 9h-2v2h-2v-2H9v-2h2V9h2v2h2Z" fill="currentColor" /></svg>
+            <span>Quản lý bệnh</span>
+        </a>
+        <a class="@ActiveClass("QuanLyTrieuChung")" asp-area="Admin" asp-controller="Portal" asp-action="QuanLyTrieuChung">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 2.12 1.2 3.69 2.35 5.21C10.47 13.71 11 14.5 11 15.5V18a1 1 0 0 0 .55.89l2 1A1 1 0 0 0 15 19v-3.5c0-1 .53-1.79 1.65-3.29C17.8 10.69 19 9.12 19 7a5 5 0 0 0-5-5Z" fill="currentColor" /></svg>
+            <span>Quản lý triệu chứng</span>
+        </a>
+        <a class="@ActiveClass("QuanLyNguoiDung")" asp-area="Admin" asp-controller="Portal" asp-action="QuanLyNguoiDung">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 1a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.31 0-6 1.79-6 4v1h8v-1a5.8 5.8 0 0 1 1.67-4A8.5 8.5 0 0 0 8 14Zm8 0c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4Z" fill="currentColor" /></svg>
+            <span>Quản lý người dùng</span>
+        </a>
+        <a class="@ActiveClass("QuanLyDiUng")" asp-area="Admin" asp-controller="Portal" asp-action="QuanLyDiUng">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.87 0 3.4 1.53 3.4 3.4 0 1.04-.48 1.98-1.22 2.6l4.82 8.34A2.99 2.99 0 0 1 16.41 21H7.59a3 3 0 0 1-2.59-4.56l4.82-8.34A3.38 3.38 0 0 1 8.6 5.4C8.6 3.53 10.13 2 12 2Zm0 2a1.4 1.4 0 1 0 0 2.8A1.4 1.4 0 0 0 12 4Zm-3.54 13h7.08L12 10.88Z" fill="currentColor" /></svg>
+            <span>Cảnh báo an toàn</span>
+        </a>
+        <a class="@ActiveClass("ThongKe")" asp-area="Admin" asp-controller="Portal" asp-action="ThongKe">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19h14v2H3V3h2Zm2-2V9h3v8Zm5 0V5h3v12Zm5 0v-6h3v6Z" fill="currentColor" /></svg>
+            <span>Thống kê</span>
+        </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+        <div class="admin-sidebar-profile">
+            <span class="admin-sidebar-profile-avatar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" fill="currentColor" /></svg>
+            </span>
+            <span>
+                <strong>@adminName</strong>
+                <span>Quản trị viên</span>
+            </span>
+            <a id="logoutLink"
+               class="admin-sidebar-logout"
+               asp-controller="Account"
+               asp-action="DangXuat"
+               asp-area=""
+               data-logout-url="@Url.Action("DangXuat", "Account", new { area = "" })"
+               title="Đăng xuất">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17v-2h5V9h-5V7h5a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2ZM7.41 12l2.3 2.29-1.42 1.42L3.59 12l4.7-3.71 1.42 1.42Z" fill="currentColor" /></svg>
+            </a>
+        </div>
+    </div>
+</aside>
