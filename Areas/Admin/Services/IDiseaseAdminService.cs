@@ -8,6 +8,6 @@ namespace Project_CNPM.Area.Admin.Services
         Task<DiseaseDetailDto?> GetDiseaseByIdAsync(int id);
         Task<(bool IsSuccess, string Message)> CreateDiseaseAsync(DiseaseCreateDto dto);
         Task<(bool IsSuccess, string Message)> UpdateDiseaseAsync(DiseaseUpdateDto dto);
-        Task<(bool IsSuccess, string Message)> SoftDeleteDiseaseAsync(int id);
+        Task<(bool IsSuccess, string Message)> ToggleDiseaseAsync(int id);
     }
 }

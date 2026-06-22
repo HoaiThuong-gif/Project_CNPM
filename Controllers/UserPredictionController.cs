@@ -51,5 +51,27 @@ namespace Project_CNPM.Controllers
 
             return BadRequest(new { message = result.Message });
         }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistory()
+        {
+            int userId = GetCurrentUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _predictionService.GetUserHistoryAsync(userId);
+            return Ok(new { message = result.Message, data = result.Data });
+        }
+
+        [HttpDelete("history/{historyId}")]
+        public async Task<IActionResult> DeleteHistory(int historyId)
+        {
+            int userId = GetCurrentUserId();
+            if (userId == 0) return Unauthorized();
+
+            var result = await _predictionService.DeleteHistoryAsync(userId, historyId);
+            if (!result.IsSuccess) return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
+        }
     }
 }

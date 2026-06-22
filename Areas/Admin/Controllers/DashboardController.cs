@@ -7,7 +7,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [ApiController]
     [Route("api/admin/[controller]")]
     [Authorize(Roles="Admin")]
-    public class DashboardController : Controller
+    public class DashboardController : ControllerBase
     {   
         private readonly IDashboardAdminService _dashboardAndmin;
 

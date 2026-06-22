@@ -9,7 +9,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [Route("api/[Controller]")]
     [Authorize(Roles="Admin")]
 
-    public class SymptomController : Controller
+    public class SymptomController : ControllerBase
     {
         private readonly ISymptomAdminService _symptomAdminService;
 
@@ -26,19 +26,19 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(symptoms);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetSymptomById(int id)
         {
             var symptom = await _symptomAdminService.GetSymptomByIdAsync(id);
 
              if (symptom == null)
-                return NotFound(new { message = "Không tìm thấy thuốc"});
+                return NotFound(new { message = "Không tìm thấy triệu chứng"});
 
             return Ok(symptom);
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateSymptom(SymptomCreateUpdateDto symptom)
+        public async Task<IActionResult> CreateSymptom([FromBody] SymptomCreateUpdateDto symptom)
         {
             var result = await _symptomAdminService.CreateSymptomAsync(symptom);
 
@@ -49,7 +49,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("update")]
-        public async Task<IActionResult> UpdateSymptom(SymptomCreateUpdateDto symptom)
+        public async Task<IActionResult> UpdateSymptom([FromBody] SymptomCreateUpdateDto symptom)
         {
             var result = await _symptomAdminService.UpdateSymptomAsync(symptom);
 
@@ -59,10 +59,10 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new {message = result.Message});
         }
 
-        [HttpPatch("delete")]
+        [HttpPatch("toggle")]
         public async Task<IActionResult> DeleteSymptom(int id)
         {
-            var result = await _symptomAdminService.SolfDeleteAsync(id);
+            var result = await _symptomAdminService.ToggleSymptomAsync(id);
 
              if(!result.IsSuccess)
                 return BadRequest(new {message = result.Message});

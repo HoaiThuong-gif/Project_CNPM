@@ -8,7 +8,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [ApiController]
     [Route("api/[Controller]")]
     [Authorize(Roles="Admin")]
-    public class DiseaseController : Controller
+    public class DiseaseController : ControllerBase
     {
         private readonly IDiseaseAdminService _diseaseAdminService;
 
@@ -26,19 +26,19 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetDiseasesById(int id)
         {
             var diseases = await _diseaseAdminService.GetDiseaseByIdAsync(id);
 
             if (diseases == null)
-                return NotFound(new { message = "Không tìm thấy thuốc"});
+                return NotFound(new { message = "Không tìm thấy bệnh"});
 
             return Ok(diseases);
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateDisease(DiseaseCreateDto disease)
+        public async Task<IActionResult> CreateDisease([FromBody] DiseaseCreateDto disease)
         {
             var result = await _diseaseAdminService.CreateDiseaseAsync(disease);
            
@@ -49,7 +49,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("Update")]
-        public async Task<IActionResult> UpdateDisease(DiseaseUpdateDto disease)
+        public async Task<IActionResult> UpdateDisease([FromBody] DiseaseUpdateDto disease)
         {
             var result = await _diseaseAdminService.UpdateDiseaseAsync(disease);
 
@@ -59,10 +59,10 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new {message = result.Message});
         }
 
-        [HttpPatch("delete")]
+        [HttpPatch("toggle")]
         public async Task<IActionResult> DeleteDisease(int id)
         {
-            var result = await _diseaseAdminService.SoftDeleteDiseaseAsync(id);
+            var result = await _diseaseAdminService.ToggleDiseaseAsync(id);
 
             if (!result.IsSuccess)
                 return BadRequest(new {message = result.Message});

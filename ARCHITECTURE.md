@@ -1,19 +1,19 @@
 # Kiến trúc dự án Project_CNPM
 
-`Project_CNPM` là ứng dụng ASP.NET Core 8 theo mô hình MVC kết hợp API controller. Backend C# dùng Entity Framework Core để làm việc với SQL Server, đồng thời gọi một service Python Flask để tạo embedding và gợi ý thuốc bằng vector search.
+`Project_CNPM` là ứng dụng ASP.NET Core 8 theo mô hình MVC kết hợp API controller. Backend C# dùng Entity Framework Core làm việc với SQL Server, đồng thời gọi một service Python Flask để tạo embedding và gợi ý thuốc bằng vector search.
 
 ## 1. Tổng quan hệ thống
 
-Ứng dụng gồm ba nhóm chức năng chính:
+Hệ thống hiện có ba nhóm chức năng chính:
 
-- Quản trị hệ thống: quản lý đăng nhập, người dùng, thuốc, bệnh, triệu chứng, cảnh báo an toàn và liên kết thuốc-bệnh.
-- Dự đoán cho người dùng: user gửi bệnh và mô tả triệu chứng, hệ thống gọi AI service để gợi ý thuốc, lưu lịch sử và nhận đánh giá kết quả.
+- Quản trị hệ thống: đăng nhập/đăng ký, dashboard, quản lý người dùng, thuốc, bệnh, triệu chứng, cảnh báo an toàn và liên kết thuốc-bệnh.
+- Dự đoán cho người dùng: người dùng gửi bệnh và mô tả triệu chứng, hệ thống gọi AI service để gợi ý thuốc, lưu lịch sử, trả cảnh báo và nhận đánh giá kết quả.
 - AI service: Flask API xử lý embedding thuốc, xóa vector thuốc, tìm thuốc phù hợp và kiểm tra trạng thái service.
 
-Luồng xử lý backend:
+Luồng backend tổng quát:
 
 1. Client gọi API ASP.NET Core.
-2. Controller nhận DTO hoặc query parameter.
+2. Controller nhận DTO, route parameter hoặc query parameter.
 3. Controller kiểm tra dữ liệu cơ bản và gọi service tương ứng.
 4. Service xử lý nghiệp vụ, đọc/ghi dữ liệu qua `ApplicationDbContext`.
 5. `ApplicationDbContext` ánh xạ dữ liệu SQL Server sang entity trong `Models`.
@@ -30,11 +30,13 @@ Luồng dự đoán thuốc:
 
 1. User đăng nhập qua `AuthController` và nhận JWT.
 2. User gọi `POST /api/UserPrediction/predict`.
-3. `UserPredictionService` kiểm tra bệnh và triệu chứng.
+3. `UserPredictionService` kiểm tra bệnh đang hoạt động và nội dung triệu chứng.
 4. Service gọi Flask `POST /predict` với bệnh, triệu chứng và `top_k = 5`.
-5. Kết quả được lưu vào `LichSuDuDoan` và `KetQuaDuDoan`.
-6. API trả danh sách thuốc gợi ý kèm `ResultId`.
-7. User có thể gửi đánh giá qua `POST /api/UserPrediction/feedback`, dữ liệu được lưu vào `DanhGiaDuDoan`.
+5. Service lấy thêm cảnh báo dị ứng, bệnh nền và tương tác thuốc từ SQL Server.
+6. Kết quả được lưu vào `LichSuDuDoan` và `KetQuaDuDoan`.
+7. API trả danh sách thuốc gợi ý kèm `ResultId` để frontend gửi feedback.
+8. User có thể gửi đánh giá qua `POST /api/UserPrediction/feedback`.
+9. User có thể xem hoặc xóa lịch sử qua các API `history`.
 
 ## 2. Cấu trúc thư mục
 
@@ -43,40 +45,8 @@ Project_CNPM/
 +-- Areas/
 |   +-- Admin/
 |       +-- Controllers/
-|       |   +-- AuthController.cs
-|       |   +-- DashboardController.cs
-|       |   +-- DiseaseController.cs
-|       |   +-- MedicineController.cs
-|       |   +-- MedicineDiseaseMappingController.cs
-|       |   +-- SafetyWarningController.cs
-|       |   +-- SymptomController.cs
-|       |   +-- UserAdminController.cs
 |       +-- DTOs/
-|       |   +-- AuthDto.cs
-|       |   +-- DashboardDto.cs
-|       |   +-- DiseaseDto.cs
-|       |   +-- MedicineDto.cs
-|       |   +-- SafetyWarningDto.cs
-|       |   +-- SymptomDto.cs
-|       |   +-- UserAdminDto.cs
-|       |   +-- medicineDiseaseDto.cs
 |       +-- Services/
-|           +-- AuthService.cs
-|           +-- DashboardService.cs
-|           +-- DiseaseAdminService.cs
-|           +-- MedicineAdminService.cs
-|           +-- MedicineDiseaseMappingService.cs
-|           +-- SafetyAdminService.cs
-|           +-- SymptomService.cs
-|           +-- UserAdminService.cs
-|           +-- IAuthService.cs
-|           +-- IDashboardService.cs
-|           +-- IDiseaseAdminService.cs
-|           +-- IMedicineAdminService.cs
-|           +-- IMedicineDiseaseMappingService.cs
-|           +-- ISafetyAdminService.cs
-|           +-- ISymptomServeice.cs
-|           +-- IUserAdminService.cs
 +-- Controllers/
 |   +-- HomeController.cs
 |   +-- UserPredictionController.cs
@@ -102,8 +72,10 @@ Project_CNPM/
 +-- Program.cs
 +-- Project_CNPM.csproj
 +-- SQL.sql
-+-- drugs_vector.npy
 +-- drug_metadata.json
++-- drugs_vector.npy
++-- TutorialViews.md
++-- ARCHITECTURE.md
 ```
 
 ## 3. Công nghệ sử dụng
@@ -130,6 +102,7 @@ Hạ tầng local:
 
 - `docker-compose.yml` chạy SQL Server 2019 trên port `1433`.
 - `SQL.sql` chứa schema và dữ liệu khởi tạo.
+- Flask service chạy mặc định tại `http://localhost:5000`.
 
 ## 4. Cấu hình ứng dụng
 
@@ -143,8 +116,8 @@ Hạ tầng local:
 - `IUserAdminService -> UserAdminService`
 - `ISafetyWarningAdminService -> SafetyWarningAdminService`
 - `IDashboardAdminService -> DashboardAdminService`
-- `IMedicineDiseaseMappingService -> MedicineDiseaseMappingService`
-- `IUserPredictionService -> UserPredictionService`
+- `IMedicineDiseaseMappingService -> MedicineDiseaseMappingService` qua `AddHttpClient`
+- `IUserPredictionService -> UserPredictionService` qua `AddHttpClient`
 - JWT Bearer Authentication.
 
 Middleware pipeline:
@@ -168,9 +141,9 @@ Middleware pipeline:
 
 Phân quyền API:
 
-- API đăng nhập/đăng ký không yêu cầu token.
-- Các API admin yêu cầu role `Admin`.
-- `MedicineController` yêu cầu đăng nhập để xem thuốc, còn thêm/sửa/đổi trạng thái thuốc yêu cầu role `Admin`.
+- `AuthController` không yêu cầu token.
+- Các API quản trị phần lớn yêu cầu role `Admin`.
+- `MedicineController` yêu cầu đăng nhập để xem thuốc; tạo, cập nhật và bật/tắt thuốc yêu cầu role `Admin`.
 - `UserPredictionController` yêu cầu user đã đăng nhập.
 
 ## 6. API controller
@@ -181,7 +154,7 @@ Route base: `api/Auth`
 
 - `POST /api/Auth/login`
 - `POST /api/Auth/register`
-- `POST /api/Auth/logout`
+- `POST /api/Auth/logout?userId={id}`
 
 Đăng nhập trả JWT, `userId` và `username`.
 
@@ -198,22 +171,22 @@ Trả thống kê tổng số user, thuốc, bệnh đang hoạt động và s�
 Route base: `api/Disease`
 
 - `GET /api/Disease`
-- `GET /api/Disease/id?id={id}`
+- `GET /api/Disease/{id}`
 - `POST /api/Disease/create`
 - `PATCH /api/Disease/Update`
-- `PATCH /api/Disease/delete?id={id}`
+- `PATCH /api/Disease/toggle?id={id}`
 
-Quản lý danh mục bệnh, gồm xem danh sách, xem chi tiết, tạo, cập nhật và xóa mềm.
+Quản lý danh mục bệnh, gồm xem danh sách, xem chi tiết, tạo, cập nhật và bật/tắt trạng thái.
 
 ### SymptomController
 
 Route base: `api/Symptom`
 
 - `GET /api/Symptom`
-- `GET /api/Symptom/id?id={id}`
+- `GET /api/Symptom/{id}`
 - `POST /api/Symptom/create`
 - `PATCH /api/Symptom/update`
-- `PATCH /api/Symptom/delete?id={id}`
+- `PATCH /api/Symptom/toggle?id={id}`
 
 Quản lý danh mục triệu chứng.
 
@@ -222,10 +195,10 @@ Quản lý danh mục triệu chứng.
 Route base: `api/Medicine`
 
 - `GET /api/Medicine`
-- `GET /api/Medicine/id?id={id}`
+- `GET /api/Medicine/{id}`
 - `POST /api/Medicine/create`
 - `PATCH /api/Medicine/update`
-- `PATCH /api/Medicine/status?id={id}&isActive={true|false}`
+- `PATCH /api/Medicine/toggle?id={id}&isActive={true|false}`
 
 Quản lý danh mục thuốc và trạng thái hoạt động của thuốc.
 
@@ -249,30 +222,30 @@ Dị ứng:
 - `GET /api/SafetyWarning/allergies`
 - `POST /api/SafetyWarning/allergies/create`
 - `PATCH /api/SafetyWarning/allergies/update`
-- `PATCH /api/SafetyWarning/allergies/status?id={id}&isActive={true|false}`
+- `PATCH /api/SafetyWarning/allergies/toggle?id={id}&isActive={true|false}`
 
 Bệnh nền:
 
 - `GET /api/SafetyWarning/background-diseases`
 - `POST /api/SafetyWarning/background-diseases/create`
 - `PATCH /api/SafetyWarning/background-diseases/update`
-- `PATCH /api/SafetyWarning/background-diseases/status?id={id}&isActive={true|false}`
+- `PATCH /api/SafetyWarning/background-diseases/toggle?id={id}&isActive={true|false}`
 
 Tương tác thuốc:
 
 - `GET /api/SafetyWarning/drug-interactions`
 - `POST /api/SafetyWarning/drug-interactions/create`
-- `DELETE /api/SafetyWarning/drug-interactions/delete?medicine1Id={id1}&medicine2Id={id2}`
+- `DELETE /api/SafetyWarning/drug-interactions/{medicine1Id}/{medicine2Id}`
 
 Quản lý dữ liệu cảnh báo an toàn cho thuốc.
 
 ### UserController
 
-File hiện nằm tại `Areas/Admin/Controllers/UserAdminController.cs`, class bên trong là `UserController`, nên route runtime là `api/User`.
+File hiện nằm tại `Areas/Admin/Controllers/UserAdminController.cs`, nhưng class bên trong là `UserController`, nên route runtime là `api/User`.
 
 - `GET /api/User`
-- `PATCH /api/User/lock?userId={id}&isLocked={true|false}`
-- `PATCH /api/User/delete?userId={id}`
+- `PATCH /api/User/{userId}/lock?isLocked={true|false}`
+- `DELETE /api/User/{userId}`
 
 Quản lý người dùng, khóa/mở khóa tài khoản và xóa mềm.
 
@@ -282,8 +255,10 @@ Route base: `api/UserPrediction`
 
 - `POST /api/UserPrediction/predict`
 - `POST /api/UserPrediction/feedback`
+- `GET /api/UserPrediction/history`
+- `DELETE /api/UserPrediction/history/{historyId}`
 
-Xử lý dự đoán thuốc cho user và nhận đánh giá kết quả dự đoán.
+Xử lý dự đoán thuốc cho user, nhận đánh giá kết quả, xem lịch sử và xóa lịch sử.
 
 ### HomeController
 
@@ -319,7 +294,7 @@ Tổng hợp thống kê:
 - Lấy bệnh theo id.
 - Tạo bệnh.
 - Cập nhật bệnh.
-- Xóa mềm bệnh.
+- Bật/tắt trạng thái bệnh.
 
 ### SymptomAdminService
 
@@ -327,7 +302,7 @@ Tổng hợp thống kê:
 - Lấy triệu chứng theo id.
 - Tạo triệu chứng.
 - Cập nhật triệu chứng.
-- Tắt trạng thái hoạt động của triệu chứng.
+- Bật/tắt trạng thái triệu chứng.
 
 ### MedicineAdminService
 
@@ -361,10 +336,13 @@ Tổng hợp thống kê:
 ### UserPredictionService
 
 - Gọi Flask `POST /predict`.
+- Lấy cảnh báo dị ứng, bệnh nền và tương tác thuốc liên quan.
 - Lưu lịch sử dự đoán vào `LichSuDuDoan`.
 - Lưu snapshot kết quả vào `KetQuaDuDoan`.
 - Trả kết quả dự đoán cho frontend.
 - Lưu feedback của user vào `DanhGiaDuDoan`.
+- Lấy lịch sử dự đoán của user.
+- Xóa lịch sử dự đoán của user.
 
 ## 8. DTO
 
@@ -382,7 +360,7 @@ DTO admin:
 DTO user:
 
 - `PredictRequestDto`: dữ liệu yêu cầu dự đoán.
-- `PredictResultDto`: dữ liệu trả kết quả dự đoán.
+- `PredictResultDto`: dữ liệu trả kết quả dự đoán, gồm cảnh báo và `ResultId`.
 - `FeedbackRequestDto`: dữ liệu gửi đánh giá.
 - `PythonPredictResponse`: dữ liệu nhận từ Flask.
 - `PythonDrugResult`: từng thuốc trong kết quả Flask.
@@ -418,7 +396,7 @@ Trọng số tính điểm:
 
 - Similarity: `0.6`
 - Độ ưu tiên điều trị: `0.3`
-- Trọng số triệu chứng/cùng bệnh: `0.1`
+- Bonus cùng bệnh: `0.1`
 
 Thuốc cần kê đơn đang bị loại khỏi kết quả gợi ý.
 
@@ -455,19 +433,13 @@ Lệnh kiểm tra:
 dotnet build
 ```
 
-Kết quả ngày 21/06/2026:
-
-- Build thành công.
-- 0 error.
-- 16 warning.
-
 ## 13. Ghi chú kỹ thuật
 
-- Một số chuỗi tiếng Việt trong source đang bị mojibake.
+- Một số chuỗi tiếng Việt trong source code đang bị mojibake.
 - `appsettings.json` đang chứa connection string và JWT key trực tiếp.
 - `ApplicationDbContext.OnConfiguring` vẫn còn connection string scaffold.
-- `MedicineAdminService` inject `HttpClient` nhưng chưa dùng trong create/update/status.
-- `ISymptomServeice.cs` và `SolfDeleteAsync` còn sai chính tả.
+- `MedicineAdminService` inject `HttpClient` nhưng chưa dùng trong create/update/toggle.
+- `ISymptomServeice.cs` và một số tên hàm/biến còn sai chính tả.
 - File `UserAdminController.cs` chứa class `UserController`.
 - Route API chưa thống nhất giữa `api/[Controller]` và `api/admin/[controller]`.
 - Chưa có test tự động trong repo.

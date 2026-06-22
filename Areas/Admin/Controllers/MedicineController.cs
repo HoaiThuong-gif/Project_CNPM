@@ -8,7 +8,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [ApiController]
     [Route("api/[Controller]")]
     [Authorize]
-    public class MedicineController : Controller
+    public class MedicineController : ControllerBase
     {
         private readonly IMedicineAdminService _medicineAdminService;
 
@@ -24,7 +24,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(medicines);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetMedicineById(int id)
         {
             var medicine = await _medicineAdminService.GetMedicineByIdAsync(id);
@@ -37,7 +37,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles="Admin")]
-        public async Task<IActionResult> CreateMedicine(MedicineCreateDto medicine)
+        public async Task<IActionResult> CreateMedicine([FromBody] MedicineCreateDto medicine)
         {
             var result = await _medicineAdminService.CreateMedicineAsync(medicine);
 
@@ -49,7 +49,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 
         [HttpPatch("update")]
         [Authorize(Roles="Admin")]
-        public async Task<IActionResult> UpdateMedicine(MedicineUpdateDto medicine)
+        public async Task<IActionResult> UpdateMedicine([FromBody] MedicineUpdateDto medicine)
         {
             var result = await _medicineAdminService.UpdateMedicineAsync(medicine);
 
@@ -59,7 +59,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new { message = result.Message });
         }
 
-        [HttpPatch("status")]
+        [HttpPatch("toggle")]
         [Authorize(Roles="Admin")]
         public async Task<IActionResult> ToggleMedicineStatus(int id, bool isActive)
         {

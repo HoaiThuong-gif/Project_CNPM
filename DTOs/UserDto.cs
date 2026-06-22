@@ -18,6 +18,10 @@ namespace Project_CNPM.DTOs
         public string Dosage { get; set; } = string.Empty;
         public double Score { get; set; }
         public string Reason { get; set; } = string.Empty;
+
+        public List<string> AllergyWarnings { get; set; } = new List<string>();
+        public List<string> DiseaseWarnings { get; set; } = new List<string>();
+        public List<string> DrugInteractions { get; set; } = new List<string>();
     }
 
     // 3. DTO Nhận đánh giá từ Frontend

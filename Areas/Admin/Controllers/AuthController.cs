@@ -6,7 +6,7 @@ namespace Project_CNPM.Area.Admin.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
@@ -18,7 +18,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(loginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] loginDto loginDto)
         {
             if (string.IsNullOrEmpty(loginDto.email) || string.IsNullOrEmpty(loginDto.password))
                 return BadRequest(new { message = "Email và mật khẩu không được để trống!" });
@@ -37,7 +37,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(registerDto registerDto)
+        public async Task<IActionResult> Register([FromBody] registerDto registerDto)
         {
             if (string.IsNullOrEmpty(registerDto.name) || string.IsNullOrEmpty(registerDto.email) || string.IsNullOrEmpty(registerDto.password) || string.IsNullOrEmpty(registerDto.confirmPassword))
                 return BadRequest(new { message = "Vui lòng điền đầy đủ thông tin!" });

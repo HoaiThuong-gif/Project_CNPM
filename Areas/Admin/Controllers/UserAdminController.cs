@@ -7,7 +7,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [ApiController]
     [Route("api/[Controller]")]
     [Authorize(Roles="Admin")]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUserAdminService _userAdminService;
 
@@ -23,7 +23,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(users);
         }
 
-        [HttpPatch("lock")]
+       [HttpPatch("{userId}/lock")]
         public async Task<IActionResult> ToggleUserLockStatus(int userId, bool isLocked)
         {
             var result = await _userAdminService.ToggleUserLockStatusAsync(userId, isLocked);
@@ -34,7 +34,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new { message = isLocked ? "Lock user success!" : "Unlock user success!" });
         }
 
-        [HttpPatch("delete")]
+        [HttpDelete("{userId}")] 
         public async Task<IActionResult> DeleteUser(int userId)
         {
             var result = await _userAdminService.SoftDeleteUserAsync(userId);

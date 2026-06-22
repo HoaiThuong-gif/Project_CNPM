@@ -86,11 +86,11 @@ namespace Project_CNPM.Area.Admin.Services
             return (true, "Update success");
         }
 
-        public async Task<(bool IsSuccess, string Message)> SolfDeleteAsync(int id)
+        public async Task<(bool IsSuccess, string Message)> ToggleSymptomAsync(int id)
         {
             var symptom = await _context.TrieuChungs.FindAsync(id);
             if (symptom == null) return (false, "Not found symptom");
-            symptom.DangHoatDong = false;
+            symptom.DangHoatDong = !symptom.DangHoatDong;
 
             await _context.SaveChangesAsync();
             return (true, "Turn off success");

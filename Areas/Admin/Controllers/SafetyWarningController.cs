@@ -8,7 +8,7 @@ namespace Project_CNPM.Area.Admin.Controllers
     [ApiController]
     [Route("api/[Controller]")]
     [Authorize(Roles="Admin")]
-    public class SafetyWarningController : Controller
+    public class SafetyWarningController : ControllerBase
     {
         private readonly ISafetyWarningAdminService _safetyWarningAdminService;
 
@@ -25,7 +25,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("allergies/create")]
-        public async Task<IActionResult> CreateAllergy(AllergyCreateUpdateDto allergy)
+        public async Task<IActionResult> CreateAllergy([FromBody] AllergyCreateUpdateDto allergy)
         {
             var result = await _safetyWarningAdminService.CreateAllergyAsync(allergy);
 
@@ -36,7 +36,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("allergies/update")]
-        public async Task<IActionResult> UpdateAllergy(AllergyCreateUpdateDto allergy)
+        public async Task<IActionResult> UpdateAllergy([FromBody] AllergyCreateUpdateDto allergy)
         {
             var result = await _safetyWarningAdminService.UpdateAllergyAsync(allergy);
 
@@ -46,7 +46,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new { message = result.Message });
         }
 
-        [HttpPatch("allergies/status")]
+        [HttpPatch("allergies/toggle")]
         public async Task<IActionResult> ToggleAllergyStatus(int id, bool isActive)
         {
             var result = await _safetyWarningAdminService.ToggleAllergyStatusAsync(id, isActive);
@@ -65,7 +65,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("background-diseases/create")]
-        public async Task<IActionResult> CreateBackgroundDisease(BackgroundDiseaseCreateUpdateDto backgroundDisease)
+        public async Task<IActionResult> CreateBackgroundDisease([FromBody] BackgroundDiseaseCreateUpdateDto backgroundDisease)
         {
             var result = await _safetyWarningAdminService.CreateBackgroundDiseaseAsync(backgroundDisease);
 
@@ -76,7 +76,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPatch("background-diseases/update")]
-        public async Task<IActionResult> UpdateBackgroundDisease(BackgroundDiseaseCreateUpdateDto backgroundDisease)
+        public async Task<IActionResult> UpdateBackgroundDisease([FromBody] BackgroundDiseaseCreateUpdateDto backgroundDisease)
         {
             var result = await _safetyWarningAdminService.UpdateBackgroundDiseaseAsync(backgroundDisease);
 
@@ -86,7 +86,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new { message = result.Message });
         }
 
-        [HttpPatch("background-diseases/status")]
+        [HttpPatch("background-diseases/toggle")]
         public async Task<IActionResult> ToggleBackgroundDiseaseStatus(int id, bool isActive)
         {
             var result = await _safetyWarningAdminService.ToggleBackgroundDiseaseStatusAsync(id, isActive);
@@ -105,7 +105,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         }
 
         [HttpPost("drug-interactions/create")]
-        public async Task<IActionResult> CreateDrugInteraction(DrugInteractionCreateDto drugInteraction)
+        public async Task<IActionResult> CreateDrugInteraction([FromBody] DrugInteractionCreateDto drugInteraction)
         {
             var result = await _safetyWarningAdminService.CreateDrugInteractionAsync(drugInteraction);
 
@@ -115,7 +115,7 @@ namespace Project_CNPM.Area.Admin.Controllers
             return Ok(new { message = result.Message });
         }
 
-        [HttpDelete("drug-interactions/delete")]
+        [HttpDelete("drug-interactions/{medicine1Id}/{medicine2Id}")]
         public async Task<IActionResult> DeleteDrugInteraction(int medicine1Id, int medicine2Id)
         {
             var result = await _safetyWarningAdminService.DeleteDrugInteractionAsync(medicine1Id, medicine2Id);

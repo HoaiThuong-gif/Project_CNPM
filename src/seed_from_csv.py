@@ -24,7 +24,6 @@ def main():
     cursor = conn.cursor()
 
     for i, r in enumerate(rows, start=1):
-        # Tra cứu MaBenh thật theo TenBenh (đã insert trước bằng insert_thuoc.sql)
         cursor.execute("SELECT MaBenh FROM Benh WHERE TenBenh = ?", r["ten_benh"])
         benh_row = cursor.fetchone()
         if benh_row is None:
@@ -32,7 +31,6 @@ def main():
             continue
         ma_benh_that = benh_row[0]
 
-        # Tra cứu MaThuoc thật theo TenThuoc (đã insert trước bằng insert_thuoc.sql)
         cursor.execute("SELECT MaThuoc FROM Thuoc WHERE TenThuoc = ?", r["ten_thuoc"])
         thuoc_row = cursor.fetchone()
         if thuoc_row is None:
@@ -41,7 +39,7 @@ def main():
         ma_thuoc_that = thuoc_row[0]
 
         payload = {
-            "ma_thuoc": ma_thuoc_that,   # MaThuoc THẬT từ SQL Server, không phải số thứ tự CSV
+            "ma_thuoc": ma_thuoc_that,   
             "ten_thuoc": r["ten_thuoc"],
             "hoat_chat": r["hoat_chat"],
             "nhom_thuoc": r["nhom_thuoc"],
@@ -50,7 +48,7 @@ def main():
             "lieu_dung": r["lieu_dung"],
             "can_ke_don": int(r["can_ke_don"]),
             "do_uu_tien": int(r["do_uu_tien"]),
-            "ma_benh": ma_benh_that,     # MaBenh THẬT từ SQL Server, không phải "dau_dau"
+            "ma_benh": ma_benh_that,    
             "ten_benh": r["ten_benh"],
             "loai_dieu_tri": r["loai_dieu_tri"],
         }

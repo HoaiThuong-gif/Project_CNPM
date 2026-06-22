@@ -4,7 +4,7 @@ using Project_CNPM.Models;
 
 namespace Project_CNPM.Controllers;
 
-public class HomeController : Controller
+public class HomeController : ControllerBase
 {
     private readonly ILogger<HomeController> _logger;
 

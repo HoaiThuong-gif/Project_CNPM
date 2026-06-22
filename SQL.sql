@@ -28,7 +28,6 @@ GO
 -- =========================
 -- 2. BẢNG BỆNH
 -- Xóa mềm: DangHoatDong + DeleteAt (có FK từ LichSuDuDoan)
--- Thêm: NhomBenh, MucDoNghiemTrong để hỗ trợ ML scoring
 -- =========================
 CREATE TABLE Benh (
     MaBenh              INT IDENTITY(1,1) PRIMARY KEY,
@@ -39,7 +38,7 @@ CREATE TABLE Benh (
     DangHoatDong        BIT             DEFAULT 1,
     DeleteAt            DATETIME        NULL,
     NgayTao             DATETIME        DEFAULT GETDATE(),
-    NgayCapNhat         DATETIME        NULL,       -- track khi nào data thay đổi (quan trọng cho embedding)
+    NgayCapNhat         DATETIME        NULL,      
 
     CONSTRAINT CK_Benh_MucDoNghiemTrong CHECK (MucDoNghiemTrong BETWEEN 1 AND 3)
 );
@@ -151,9 +150,6 @@ JOIN TrieuChung t ON t.TenTrieuChung = src.TenTrieuChung;
 -- =========================
 -- 5. BẢNG THUỐC
 -- Xóa mềm: DangHoatDong (có FK từ KetQuaDuDoan)
--- Thêm: NhomThuoc, DangBaoChe, CanKeDon, NgayCapNhat
--- CanKeDon quan trọng: hệ thống chỉ gợi ý thuốc OTC (CanKeDon = 0)
--- NgayCapNhat để biết embedding có bị stale không
 -- =========================
 CREATE TABLE Thuoc (
     MaThuoc         INT IDENTITY(1,1) PRIMARY KEY,
@@ -223,12 +219,11 @@ GO
 -- =========================
 -- 7. BỆNH - THUỐC
 -- Xóa cứng: mapping table
--- Thêm: DoUuTien, LoaiDieuTri để hỗ trợ ML reranking
 -- =========================
 CREATE TABLE BenhThuoc (
     MaBenh          INT,
     MaThuoc         INT,
-    DoUuTien        INT             DEFAULT 1,          -- thuốc nào ưu tiên hơn cho bệnh này (dùng trong scoring)
+    DoUuTien        INT             DEFAULT 1,          
     LoaiDieuTri     VARCHAR(20)     DEFAULT 'primary',  -- primary: đầu tay, secondary: thay thế
 
     PRIMARY KEY (MaBenh, MaThuoc),
@@ -238,6 +233,48 @@ CREATE TABLE BenhThuoc (
     CONSTRAINT CK_BenhThuoc_LoaiDieuTri CHECK (LoaiDieuTri IN ('primary', 'secondary', 'alternative'))
 );
 GO
+
+INSERT INTO BenhThuoc (MaBenh, MaThuoc, DoUuTien, LoaiDieuTri)
+SELECT b.MaBenh, t.MaThuoc, src.DoUuTien, src.LoaiDieuTri
+FROM (VALUES
+    -- CẢM CÚM
+    (N'Cảm cúm', N'Paracetamol 500mg',          1, 'primary'),
+    (N'Cảm cúm', N'Ibuprofen 200mg',             2, 'primary'),
+    (N'Cảm cúm', N'Cetirizine 10mg',             2, 'secondary'),
+    (N'Cảm cúm', N'Dextromethorphan 15mg',        2, 'secondary'),
+    (N'Cảm cúm', N'Vitamin C 500mg',             3, 'alternative'),
+ 
+    -- ĐAU ĐẦU
+    (N'Đau đầu', N'Paracetamol 500mg',           1, 'primary'),
+    (N'Đau đầu', N'Ibuprofen 400mg',             1, 'primary'),
+    (N'Đau đầu', N'Aspirin 500mg',               2, 'secondary'),
+    (N'Đau đầu', N'Cafein kết hợp Paracetamol',  2, 'secondary'),
+    (N'Đau đầu', N'Cao dán giảm đau Salonpas',   3, 'alternative'),
+ 
+    -- TIÊU CHẢY
+    (N'Tiêu chảy', N'Oresol',                    1, 'primary'),
+    (N'Tiêu chảy', N'Loperamide 2mg',            1, 'primary'),
+    (N'Tiêu chảy', N'Smecta (Diosmectite)',       2, 'secondary'),
+    (N'Tiêu chảy', N'Men vi sinh Probiotic',      2, 'secondary'),
+    (N'Tiêu chảy', N'Berberin 50mg',             3, 'alternative'),
+ 
+    -- DỊ ỨNG / MỀ ĐAY
+    (N'Dị ứng / Mề đay', N'Loratadine 10mg',         1, 'primary'),
+    (N'Dị ứng / Mề đay', N'Chlorpheniramine 4mg',     1, 'primary'),
+    (N'Dị ứng / Mề đay', N'Fexofenadine 60mg',        2, 'secondary'),
+    (N'Dị ứng / Mề đay', N'Kem bôi Hydrocortisone 1%',2, 'secondary'),
+    (N'Dị ứng / Mề đay', N'Calamine Lotion',          3, 'alternative'),
+ 
+    -- ĐAU DẠ DÀY
+    (N'Đau dạ dày', N'Antacid (Nhôm hydroxit + Magie hydroxit)', 1, 'primary'),
+    (N'Đau dạ dày', N'Omeprazole 20mg (OTC)',                    1, 'primary'),
+    (N'Đau dạ dày', N'Simethicone 80mg',                         2, 'secondary'),
+    (N'Đau dạ dày', N'Sucralfate 1g',                            2, 'secondary'),
+    (N'Đau dạ dày', N'Domperidone 10mg',                         3, 'alternative')
+ 
+) AS src(TenBenh, TenThuoc, DoUuTien, LoaiDieuTri)
+JOIN Benh b  ON b.TenBenh  = src.TenBenh
+JOIN Thuoc t ON t.TenThuoc = src.TenThuoc;
 
 -- =========================
 -- 8. DỊ ỨNG
@@ -250,21 +287,41 @@ CREATE TABLE DiUng (
 );
 GO
 
+INSERT INTO DiUng (TenDiUng) VALUES (N'Dị ứng Penicillin'),
+                                    (N'Dị ứng Aspirin / NSAID'),
+                                    (N'Dị ứng Sulfonamide'),
+                                    (N'Dị ứng phấn hoa'),
+                                    (N'Dị ứng bụi nhà'),
+                                    (N'Dị ứng hải sản'),
+                                    (N'Dị ứng đậu phộng'),
+                                    (N'Dị ứng Latex');
 -- =========================
 -- 9. CẢNH BÁO DỊ ỨNG THUỐC
 -- Xóa cứng: mapping table
--- Scope tham khảo: chỉ hiển thị cảnh báo, không block kết quả
 -- =========================
 CREATE TABLE CanhBaoDiUngThuoc (
     MaThuoc     INT,
     MaDiUng     INT,
-    NoiDung     NVARCHAR(MAX),  -- nội dung cảnh báo hiển thị cho user
+    NoiDung     NVARCHAR(MAX),
 
     PRIMARY KEY (MaThuoc, MaDiUng),
     FOREIGN KEY (MaThuoc)   REFERENCES Thuoc(MaThuoc),
     FOREIGN KEY (MaDiUng)   REFERENCES DiUng(MaDiUng)
 );
 GO
+
+INSERT INTO CanhBaoDiUngThuoc (MaThuoc, MaDiUng, NoiDung)
+SELECT t.MaThuoc, d.MaDiUng, src.NoiDung
+FROM (VALUES
+    (N'Aspirin 500mg',      N'Dị ứng Aspirin / NSAID',  N'Thuốc chứa Aspirin. Không dùng nếu bạn có tiền sử dị ứng với Aspirin hoặc NSAID.'),
+    (N'Ibuprofen 200mg',    N'Dị ứng Aspirin / NSAID',  N'Ibuprofen thuộc nhóm NSAID. Có thể gây phản ứng chéo với người dị ứng Aspirin.'),
+    (N'Ibuprofen 400mg',    N'Dị ứng Aspirin / NSAID',  N'Ibuprofen thuộc nhóm NSAID. Có thể gây phản ứng chéo với người dị ứng Aspirin.'),
+    (N'Cetirizine 10mg',    N'Dị ứng hải sản',           N'Một số người dị ứng hải sản có thể nhạy cảm với Cetirizine. Hỏi dược sĩ trước khi dùng.'),
+    (N'Loratadine 10mg',    N'Dị ứng phấn hoa',          N'Loratadine thường dùng cho dị ứng phấn hoa nhưng cần điều chỉnh liều nếu phản ứng nặng.'),
+    (N'Fexofenadine 60mg',  N'Dị ứng phấn hoa',          N'Fexofenadine hiệu quả với dị ứng phấn hoa, theo dõi nếu triệu chứng không cải thiện sau 3 ngày.')
+) AS src(TenThuoc, TenDiUng, NoiDung)
+JOIN Thuoc t ON t.TenThuoc = src.TenThuoc
+JOIN DiUng d ON d.TenDiUng = src.TenDiUng;
 
 -- =========================
 -- 10. BỆNH NỀN
@@ -277,15 +334,20 @@ CREATE TABLE BenhNen (
 );
 GO
 
+INSERT INTO BenhNen (TenBenhNen) VALUES (N'Viêm loét dạ dày tá tràng'),
+                                        (N'Suy thận mạn'),
+                                        (N'Suy gan'),
+                                        (N'Tiểu đường'),
+                                        (N'Tăng huyết áp')
+
 -- =========================
 -- 11. CẢNH BÁO BỆNH NỀN
 -- Xóa cứng: mapping table
--- Scope tham khảo: chỉ hiển thị cảnh báo, không block kết quả
 -- =========================
 CREATE TABLE CanhBaoBenhNenThuoc (
     MaThuoc     INT,
     MaBenhNen   INT,
-    NoiDung     NVARCHAR(MAX),  -- nội dung cảnh báo hiển thị cho user
+    NoiDung     NVARCHAR(MAX),
 
     PRIMARY KEY (MaThuoc, MaBenhNen),
     FOREIGN KEY (MaThuoc)   REFERENCES Thuoc(MaThuoc),
@@ -293,11 +355,47 @@ CREATE TABLE CanhBaoBenhNenThuoc (
 );
 GO
 
+INSERT INTO CanhBaoBenhNenThuoc (MaThuoc, MaBenhNen, NoiDung)
+SELECT t.MaThuoc, bn.MaBenhNen, src.NoiDung
+FROM (VALUES
+    -- Aspirin
+    (N'Aspirin 500mg', N'Viêm loét dạ dày tá tràng', N'Aspirin kích ứng mạnh niêm mạc dạ dày. Không dùng khi đang viêm loét dạ dày.'),
+    (N'Aspirin 500mg', N'Suy thận mạn',               N'Aspirin tích lũy ở người suy thận, tăng nguy cơ chảy máu. Hỏi bác sĩ trước khi dùng.'),
+ 
+    -- Ibuprofen 200mg
+    (N'Ibuprofen 200mg', N'Viêm loét dạ dày tá tràng', N'Ibuprofen có thể làm nặng thêm loét dạ dày. Uống sau ăn, kết hợp thuốc bảo vệ dạ dày nếu cần.'),
+    (N'Ibuprofen 200mg', N'Suy thận mạn',               N'NSAID giảm lưu lượng máu thận, nguy hiểm với người suy thận. Dùng Paracetamol thay thế.'),
+    (N'Ibuprofen 200mg', N'Tăng huyết áp',               N'NSAID có thể làm tăng huyết áp và giảm hiệu quả thuốc hạ áp. Thận trọng khi dùng.'),
+ 
+    -- Ibuprofen 400mg
+    (N'Ibuprofen 400mg', N'Viêm loét dạ dày tá tràng', N'Ibuprofen có thể làm nặng thêm loét dạ dày. Uống sau ăn, kết hợp thuốc bảo vệ dạ dày nếu cần.'),
+    (N'Ibuprofen 400mg', N'Suy thận mạn',               N'NSAID giảm lưu lượng máu thận, nguy hiểm với người suy thận. Dùng Paracetamol thay thế.'),
+    (N'Ibuprofen 400mg', N'Tăng huyết áp',               N'NSAID có thể làm tăng huyết áp và giảm hiệu quả thuốc hạ áp. Thận trọng khi dùng.'),
+ 
+    -- Paracetamol
+    (N'Paracetamol 500mg', N'Suy gan', N'Paracetamol chuyển hóa qua gan. Người suy gan cần giảm liều hoặc hỏi bác sĩ.'),
+ 
+    -- Omeprazole
+    (N'Omeprazole 20mg (OTC)', N'Suy gan', N'Omeprazole chuyển hóa qua gan. Người suy gan cần giảm liều, hỏi bác sĩ.'),
+ 
+    -- Domperidone
+    (N'Domperidone 10mg', N'Suy gan',       N'Domperidone chuyển hóa qua gan. Không dùng cho người suy gan nặng.'),
+    (N'Domperidone 10mg', N'Tăng huyết áp', N'Domperidone có thể ảnh hưởng nhịp tim, thận trọng với người có bệnh tim mạch.'),
+ 
+    -- Chlorpheniramine
+    (N'Chlorpheniramine 4mg', N'Tiểu đường',   N'Một số dạng bào chế Chlorpheniramine có đường. Chọn dạng không đường.'),
+    (N'Chlorpheniramine 4mg', N'Tăng huyết áp', N'Thận trọng khi dùng kháng histamin thế hệ 1 với người tăng huyết áp.'),
+ 
+    -- Sucralfate
+    (N'Sucralfate 1g', N'Suy thận mạn', N'Sucralfate chứa nhôm, người suy thận có thể tích lũy nhôm. Hỏi bác sĩ trước khi dùng.')
+ 
+) AS src(TenThuoc, TenBenhNen, NoiDung)
+JOIN Thuoc   t  ON t.TenThuoc    = src.TenThuoc
+JOIN BenhNen bn ON bn.TenBenhNen = src.TenBenhNen;
 -- =========================
 -- 12. TƯƠNG TÁC THUỐC (TABLE MỚI)
 -- Xóa cứng: mapping table
 -- Scope tham khảo: hiển thị cảnh báo khi user đang dùng nhiều thuốc cùng lúc
--- Không block kết quả, chỉ warn
 -- =========================
 CREATE TABLE TuongTacThuoc (
     MaThuoc1            INT,
@@ -309,10 +407,32 @@ CREATE TABLE TuongTacThuoc (
     FOREIGN KEY (MaThuoc1) REFERENCES Thuoc(MaThuoc),
     FOREIGN KEY (MaThuoc2) REFERENCES Thuoc(MaThuoc),
 
-    CONSTRAINT CK_TuongTacThuoc_MaThuoc     CHECK (MaThuoc1 < MaThuoc2),       -- tránh nhập trùng (A,B) và (B,A)
+    CONSTRAINT CK_TuongTacThuoc_MaThuoc     CHECK (MaThuoc1 < MaThuoc2), 
     CONSTRAINT CK_TuongTacThuoc_MucDo       CHECK (MucDoNghiemTrong BETWEEN 1 AND 3)
 );
 GO
+
+INSERT INTO TuongTacThuoc (MaThuoc1, MaThuoc2, MucDoNghiemTrong, MoTa)
+SELECT
+    CASE WHEN t1.MaThuoc < t2.MaThuoc THEN t1.MaThuoc ELSE t2.MaThuoc END,
+    CASE WHEN t1.MaThuoc < t2.MaThuoc THEN t2.MaThuoc ELSE t1.MaThuoc END,
+    src.MucDo,
+    src.MoTa
+FROM (VALUES
+    (N'Aspirin 500mg',      N'Ibuprofen 200mg',     2, N'Hai thuốc cùng nhóm NSAID, dùng chung tăng nguy cơ chảy máu tiêu hóa và tổn thương thận.'),
+    (N'Aspirin 500mg',      N'Ibuprofen 400mg',     2, N'Hai thuốc cùng nhóm NSAID, dùng chung tăng nguy cơ chảy máu tiêu hóa và tổn thương thận.'),
+    (N'Ibuprofen 200mg',    N'Ibuprofen 400mg',     3, N'Không dùng hai dạng liều Ibuprofen cùng lúc, nguy cơ quá liều nghiêm trọng.'),
+    (N'Aspirin 500mg',      N'Sucralfate 1g',       1, N'Sucralfate giảm hấp thu Aspirin. Uống cách nhau ít nhất 2 giờ.'),
+    (N'Omeprazole 20mg (OTC)', N'Sucralfate 1g',    1, N'Sucralfate cần môi trường acid để hoạt động, Omeprazole giảm acid có thể làm giảm hiệu quả Sucralfate. Uống cách nhau ít nhất 2 giờ.'),
+    (N'Smecta (Diosmectite)', N'Loperamide 2mg',    1, N'Smecta có thể hấp phụ Loperamide, làm giảm hiệu quả. Uống cách nhau ít nhất 2 giờ.'),
+    (N'Smecta (Diosmectite)', N'Berberin 50mg',     1, N'Smecta có thể hấp phụ Berberin, làm giảm hiệu quả. Uống cách nhau ít nhất 2 giờ.'),
+    (N'Chlorpheniramine 4mg', N'Dextromethorphan 15mg', 1, N'Cả hai đều gây buồn ngủ và ức chế thần kinh trung ương. Dùng chung tăng nguy cơ buồn ngủ quá mức.'),
+    (N'Cetirizine 10mg',    N'Chlorpheniramine 4mg', 2, N'Hai kháng histamin dùng chung không tăng hiệu quả mà tăng tác dụng phụ (buồn ngủ, khô miệng).'),
+    (N'Loratadine 10mg',    N'Cetirizine 10mg',     2, N'Hai kháng histamin dùng chung không tăng hiệu quả mà tăng tác dụng phụ.'),
+    (N'Antacid (Nhôm hydroxit + Magie hydroxit)', N'Omeprazole 20mg (OTC)', 1, N'Antacid giảm hấp thu Omeprazole nếu dùng cùng lúc. Uống Omeprazole trước ăn, Antacid sau ăn.')
+) AS src(TenThuoc1, TenThuoc2, MucDo, MoTa)
+JOIN Thuoc t1 ON t1.TenThuoc = src.TenThuoc1
+JOIN Thuoc t2 ON t2.TenThuoc = src.TenThuoc2;
 
 -- =========================
 -- 13. QUY TẮC GỢI Ý THUỐC
@@ -435,14 +555,14 @@ CREATE TABLE DanhGiaDuDoan (
     MaDanhGia       INT IDENTITY(1,1) PRIMARY KEY,
     MaKetQua        INT             NOT NULL,
     MaNguoiDung     INT             NOT NULL,
-    HuuIch          BIT             NOT NULL,   -- 1: hữu ích, 0: không hữu ích
-    GhiChu          NVARCHAR(MAX),              -- user có thể ghi thêm lý do (optional)
+    HuuIch          BIT             NOT NULL,  
+    GhiChu          NVARCHAR(MAX),          
     NgayTao         DATETIME        DEFAULT GETDATE(),
 
     FOREIGN KEY (MaKetQua)      REFERENCES KetQuaDuDoan(MaKetQua),
     FOREIGN KEY (MaNguoiDung)   REFERENCES NguoiDung(MaNguoiDung),
 
-    CONSTRAINT UQ_DanhGia_KetQua_NguoiDung UNIQUE (MaKetQua, MaNguoiDung)  -- mỗi user chỉ đánh giá 1 lần / kết quả
+    CONSTRAINT UQ_DanhGia_KetQua_NguoiDung UNIQUE (MaKetQua, MaNguoiDung)  
 );
 GO
 

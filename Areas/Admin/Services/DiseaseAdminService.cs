@@ -101,7 +101,7 @@ namespace Project_CNPM.Area.Admin.Services
             return (true, "Update success!");
         }
 
-        public async Task<(bool IsSuccess, string Message)> SoftDeleteDiseaseAsync(int id)
+        public async Task<(bool IsSuccess, string Message)> ToggleDiseaseAsync(int id)
         {
             var benh = await _context.Benhs.FindAsync(id);
 
