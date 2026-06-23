@@ -2,6 +2,7 @@ const historyRoot = document.querySelector(".history-container");
 
 if (historyRoot) {
     const historyUrl = historyRoot.dataset.historyUrl;
+    const resultUrl = historyRoot.dataset.resultUrl;
     const loginUrl = historyRoot.dataset.loginUrl;
     const token = localStorage.getItem("token");
     const historyList = document.getElementById("historyList");
@@ -111,6 +112,35 @@ if (historyRoot) {
         }
     };
 
+    const openHistoryDetail = (item) => {
+        const predictionInput = {
+            diseaseName: item.diseaseName || "",
+            symptoms: item.symptoms || "",
+            createdAt: item.createdAt || ""
+        };
+
+        const predictionResults = Array.isArray(item.results)
+            ? item.results.map((result) => ({
+                resultId: result.resultId,
+                medicineId: result.medicineId,
+                medicineName: result.medicineName,
+                uses: result.uses,
+                dosage: result.dosage,
+                howToUse: result.howToUse,
+                sideEffects: result.sideEffects,
+                notes: result.notes,
+                contraindications: result.contraindications,
+                score: result.score,
+                reason: result.reason,
+                warnings: result.warnings
+            }))
+            : [];
+
+        sessionStorage.setItem("predictionInput", JSON.stringify(predictionInput));
+        sessionStorage.setItem("predictionResults", JSON.stringify(predictionResults));
+        window.location.href = resultUrl;
+    };
+
     const loadHistory = async () => {
         if (!token) {
             redirectToLogin();
@@ -138,7 +168,7 @@ if (historyRoot) {
         const currentItem = historyItems.find((item) => item.historyId === historyId);
 
         if (action === "view" && currentItem) {
-            alert(`Bệnh: ${currentItem.diseaseName}\nThông tin đã nhập: ${currentItem.symptoms}\nThuốc: ${(currentItem.medicines || []).join(", ")}`);
+            openHistoryDetail(currentItem);
             return;
         }
 

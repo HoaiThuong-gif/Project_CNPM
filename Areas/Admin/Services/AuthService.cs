@@ -22,7 +22,8 @@ namespace Project_CNPM.Area.Admin.Services
 
         private string GenerateJwtToken(NguoiDung user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is not configured.");
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -47,7 +48,7 @@ namespace Project_CNPM.Area.Admin.Services
         {
             var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.Email == request.email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.password, user.MatKhauMaHoa))
+            if (user == null || !IsPasswordValid(request.password, user.MatKhauMaHoa))
                 return (false, "User not found or incorrect password", null, null);
 
             if (user.DeleteAt != null)
@@ -73,6 +74,9 @@ namespace Project_CNPM.Area.Admin.Services
                 HoTen = request.name,
                 Email = request.email,
                 MatKhauMaHoa = hashedPassword,
+                VaiTro = "User",
+                BiKhoa = false,
+                NgayTao = DateTime.Now
             };
             _context.NguoiDungs.Add(newUser);
             await _context.SaveChangesAsync();
@@ -82,6 +86,23 @@ namespace Project_CNPM.Area.Admin.Services
         public async Task<(bool IsSuccess, string Message)> LogoutAsync(int userId)
         {
             return (true, "Logout successful");
+        }
+
+        private static bool IsPasswordValid(string plainPassword, string hashedPassword)
+        {
+            if (string.IsNullOrWhiteSpace(hashedPassword))
+            {
+                return false;
+            }
+
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(plainPassword, hashedPassword);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

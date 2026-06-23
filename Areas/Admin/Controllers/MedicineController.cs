@@ -21,7 +21,7 @@ namespace Project_CNPM.Area.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllMedicines()
         {
-            var medicines = await _medicineAdminService.GetAllMedicinesAsync(true);
+            var medicines = await _medicineAdminService.GetAllMedicinesAsync(User.IsInRole("Admin"));
             return Ok(medicines);
         }
 
@@ -31,6 +31,9 @@ namespace Project_CNPM.Area.Admin.Controllers
             var medicine = await _medicineAdminService.GetMedicineByIdAsync(id);
 
             if (medicine == null)
+                return NotFound(new { message = "Not found medicine" });
+
+            if (!User.IsInRole("Admin") && !medicine.IsActive)
                 return NotFound(new { message = "Not found medicine" });
 
             return Ok(medicine);

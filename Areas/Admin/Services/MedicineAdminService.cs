@@ -21,12 +21,19 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<IEnumerable<MedicineDetailDto>> GetAllMedicinesAsync(bool includeInactive = true)
         {
-            var query = _context.Thuocs.AsQueryable();
+            var query = _context.Thuocs
+                .Include(t => t.MaThanhPhans)
+                .Include(t => t.CanhBaoDiUngThuocs)
+                    .ThenInclude(c => c.MaDiUngNavigation)
+                .Include(t => t.CanhBaoBenhNenThuocs)
+                    .ThenInclude(c => c.MaBenhNenNavigation)
+                .AsQueryable();
 
             if (!includeInactive)
                 query = query.Where(t => t.DangHoatDong == true);
 
-            return await query.Select(t => new MedicineDetailDto
+            var medicines = await query.ToListAsync();
+            return medicines.Select(t => new MedicineDetailDto
             {
                 MedicineId = t.MaThuoc,
                 MedicineName = t.TenThuoc,
@@ -38,16 +45,24 @@ namespace Project_CNPM.Area.Admin.Services
                 HowToUse = t.CachDung ?? string.Empty,
                 SideEffects = t.TacDungPhu ?? string.Empty,
                 Notes = t.LuuY ?? string.Empty,
+                Components = BuildMedicineComponents(t),
+                Contraindications = BuildMedicineContraindications(t),
                 RequiresPrescription = t.CanKeDon,
                 IsActive = t.DangHoatDong ?? false,
                 CreatedAt = t.NgayTao ?? DateTime.Now,
                 UpdatedAt = t.NgayCapNhat
-            }).ToListAsync();
+            }).ToList();
         }
 
         public async Task<MedicineDetailDto?> GetMedicineByIdAsync(int id)
         {
-            var t = await _context.Thuocs.FindAsync(id);
+            var t = await _context.Thuocs
+                .Include(x => x.MaThanhPhans)
+                .Include(x => x.CanhBaoDiUngThuocs)
+                    .ThenInclude(x => x.MaDiUngNavigation)
+                .Include(x => x.CanhBaoBenhNenThuocs)
+                    .ThenInclude(x => x.MaBenhNenNavigation)
+                .FirstOrDefaultAsync(x => x.MaThuoc == id);
             if (t == null) return null;
 
             return new MedicineDetailDto
@@ -62,6 +77,8 @@ namespace Project_CNPM.Area.Admin.Services
                 HowToUse = t.CachDung ?? string.Empty,
                 SideEffects = t.TacDungPhu ?? string.Empty,
                 Notes = t.LuuY ?? string.Empty,
+                Components = BuildMedicineComponents(t),
+                Contraindications = BuildMedicineContraindications(t),
                 RequiresPrescription = t.CanKeDon,
                 IsActive = t.DangHoatDong ?? false,
                 CreatedAt = t.NgayTao ?? DateTime.Now,
@@ -71,21 +88,25 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<(bool IsSuccess, string Message)> CreateMedicineAsync(MedicineCreateDto dto)
         {
-            var exists = await _context.Thuocs.AnyAsync(t => t.TenThuoc == dto.MedicineName);
+            if (string.IsNullOrWhiteSpace(dto.MedicineName))
+                return (false, "Medicine name cannot be empty");
+
+            var medicineName = dto.MedicineName.Trim();
+            var exists = await _context.Thuocs.AnyAsync(t => t.TenThuoc.ToLower() == medicineName.ToLower());
             if (exists)
                 return (false, "Medicine already exists");
 
             var thuoc = new Thuoc
             {
-                TenThuoc = dto.MedicineName,
-                HoatChat = dto.ActiveIngredient,
-                NhomThuoc = dto.MedicineGroup,
-                DangBaoChe = dto.DosageForm,
-                CongDung = dto.Uses,
-                LieuDung = dto.Dosage,
-                CachDung = dto.HowToUse,
-                TacDungPhu = dto.SideEffects,
-                LuuY = dto.Notes,
+                TenThuoc = medicineName,
+                HoatChat = dto.ActiveIngredient?.Trim(),
+                NhomThuoc = dto.MedicineGroup?.Trim(),
+                DangBaoChe = dto.DosageForm?.Trim(),
+                CongDung = dto.Uses?.Trim(),
+                LieuDung = dto.Dosage?.Trim(),
+                CachDung = dto.HowToUse?.Trim(),
+                TacDungPhu = dto.SideEffects?.Trim(),
+                LuuY = dto.Notes?.Trim(),
                 CanKeDon = dto.RequiresPrescription,
                 DangHoatDong = true,
                 NgayTao = DateTime.Now
@@ -99,22 +120,26 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<(bool IsSuccess, string Message)> UpdateMedicineAsync(MedicineUpdateDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.MedicineName))
+                return (false, "Medicine name cannot be empty");
+
             var thuoc = await _context.Thuocs.FindAsync(dto.MedicineId);
             if (thuoc == null) return (false, "Not found medicine");
 
-            var exists = await _context.Thuocs.AnyAsync(t => t.MaThuoc != dto.MedicineId && t.TenThuoc == dto.MedicineName);
+            var medicineName = dto.MedicineName.Trim();
+            var exists = await _context.Thuocs.AnyAsync(t => t.MaThuoc != dto.MedicineId && t.TenThuoc.ToLower() == medicineName.ToLower());
             if (exists)
                 return (false, "Medicine already exists");
 
-            thuoc.TenThuoc = dto.MedicineName;
-            thuoc.HoatChat = dto.ActiveIngredient;
-            thuoc.NhomThuoc = dto.MedicineGroup;
-            thuoc.DangBaoChe = dto.DosageForm;
-            thuoc.CongDung = dto.Uses;
-            thuoc.LieuDung = dto.Dosage;
-            thuoc.CachDung = dto.HowToUse;
-            thuoc.TacDungPhu = dto.SideEffects;
-            thuoc.LuuY = dto.Notes;
+            thuoc.TenThuoc = medicineName;
+            thuoc.HoatChat = dto.ActiveIngredient?.Trim();
+            thuoc.NhomThuoc = dto.MedicineGroup?.Trim();
+            thuoc.DangBaoChe = dto.DosageForm?.Trim();
+            thuoc.CongDung = dto.Uses?.Trim();
+            thuoc.LieuDung = dto.Dosage?.Trim();
+            thuoc.CachDung = dto.HowToUse?.Trim();
+            thuoc.TacDungPhu = dto.SideEffects?.Trim();
+            thuoc.LuuY = dto.Notes?.Trim();
             thuoc.CanKeDon = dto.RequiresPrescription;
             thuoc.DangHoatDong = dto.IsActive;
             thuoc.NgayCapNhat = DateTime.Now;
@@ -134,6 +159,23 @@ namespace Project_CNPM.Area.Admin.Services
 
             await _context.SaveChangesAsync();
             return (true, isActive ? "Turn on medicine success!" : "Turn off medicine success!");
+        }
+
+        private static string BuildMedicineComponents(Thuoc medicine)
+        {
+            return medicine.MaThanhPhans.Any()
+                ? string.Join(", ", medicine.MaThanhPhans.Select(x => x.TenThanhPhan))
+                : medicine.HoatChat ?? string.Empty;
+        }
+
+        private static string BuildMedicineContraindications(Thuoc medicine)
+        {
+            var warnings = medicine.CanhBaoDiUngThuocs
+                .Select(x => $"Dị ứng {x.MaDiUngNavigation.TenDiUng}: {x.NoiDung}")
+                .Concat(medicine.CanhBaoBenhNenThuocs.Select(x => $"Bệnh nền {x.MaBenhNenNavigation.TenBenhNen}: {x.NoiDung}"))
+                .ToList();
+
+            return warnings.Any() ? string.Join(" | ", warnings) : string.Empty;
         }
 
     }

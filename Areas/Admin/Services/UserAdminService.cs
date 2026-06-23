@@ -21,10 +21,10 @@ namespace Project_CNPM.Area.Admin.Services{
                 UserId = u.MaNguoiDung,
                 FullName = u.HoTen,
                 Email = u.Email,
-                Phone = u.SoDienThoai,
-                Gender = u.GioiTinh,
+                Phone = u.SoDienThoai ?? string.Empty,
+                Gender = u.GioiTinh ?? string.Empty,
                 DateOfBirth = u.NgaySinh,
-                Role = u.VaiTro,
+                Role = u.VaiTro ?? "User",
                 IsLocked = u.BiKhoa ?? false,
                 IsDeleted = u.DeleteAt != null,
                 CreatedAt = u.NgayTao ?? DateTime.Now

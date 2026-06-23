@@ -17,30 +17,48 @@ namespace Project_CNPM.Area.Admin.Services
 
         public async Task<IEnumerable<SymptomDetailDto>> GetAllSymptomsAsync()
         {
-            var query = _context.TrieuChungs.AsQueryable();
+            var query = _context.TrieuChungs
+                .Include(t => t.BenhTrieuChungs)
+                    .ThenInclude(bt => bt.MaBenhNavigation)
+                .AsQueryable();
 
             return await query.Select(t => new SymptomDetailDto
             {
                 SymptomId = t.MaTrieuChung,
                 SymptomName = t.TenTrieuChung,
-                Description = t.MoTa,
+                Description = t.MoTa ?? string.Empty,
                 IsActive = t.DangHoatDong ?? false,
-                CreatedAt = t.NgayTao ?? DateTime.Now
+                CreatedAt = t.NgayTao ?? DateTime.Now,
+                DiseaseIds = t.BenhTrieuChungs.Select(x => x.MaBenh).ToList(),
+                Diseases = t.BenhTrieuChungs.Select(x => new SymptomDiseaseLinkDto
+                {
+                    DiseaseId = x.MaBenh,
+                    DiseaseName = x.MaBenhNavigation.TenBenh
+                }).ToList()
             }).ToListAsync();
         }
 
         public async Task<SymptomDetailDto?> GetSymptomByIdAsync(int id)
         {
-            var t = await _context.TrieuChungs.FindAsync(id);
+            var t = await _context.TrieuChungs
+                .Include(x => x.BenhTrieuChungs)
+                    .ThenInclude(bt => bt.MaBenhNavigation)
+                .FirstOrDefaultAsync(x => x.MaTrieuChung == id);
             if (t == null) return null;
 
             return new SymptomDetailDto
             {
                 SymptomId = t.MaTrieuChung,
                 SymptomName = t.TenTrieuChung,
-                Description = t.MoTa,
+                Description = t.MoTa ?? string.Empty,
                 IsActive = t.DangHoatDong ?? false,
-                CreatedAt = t.NgayTao ?? DateTime.Now
+                CreatedAt = t.NgayTao ?? DateTime.Now,
+                DiseaseIds = t.BenhTrieuChungs.Select(x => x.MaBenh).ToList(),
+                Diseases = t.BenhTrieuChungs.Select(x => new SymptomDiseaseLinkDto
+                {
+                    DiseaseId = x.MaBenh,
+                    DiseaseName = x.MaBenhNavigation.TenBenh
+                }).ToList()
             };
         }
 
@@ -65,6 +83,7 @@ namespace Project_CNPM.Area.Admin.Services
             _context.TrieuChungs.Add(trieuChung);
             
             await _context.SaveChangesAsync();
+            await SyncSymptomDiseasesAsync(trieuChung.MaTrieuChung, dto.DiseaseIds);
             return (true, "Add success");
         }
 
@@ -82,6 +101,7 @@ namespace Project_CNPM.Area.Admin.Services
 
             trieuChung.TenTrieuChung = dto.SymptomName.Trim();
             trieuChung.MoTa = dto.Description?.Trim();
+            await SyncSymptomDiseasesAsync(trieuChung.MaTrieuChung, dto.DiseaseIds);
             await _context.SaveChangesAsync();
             return (true, "Update success");
         }
@@ -94,6 +114,38 @@ namespace Project_CNPM.Area.Admin.Services
 
             await _context.SaveChangesAsync();
             return (true, "Turn off success");
+        }
+
+        private async Task SyncSymptomDiseasesAsync(int symptomId, IEnumerable<int>? diseaseIds)
+        {
+            var newIds = (diseaseIds ?? Enumerable.Empty<int>())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToHashSet();
+
+            var currentLinks = await _context.BenhTrieuChungs
+                .Where(x => x.MaTrieuChung == symptomId)
+                .ToListAsync();
+
+            _context.BenhTrieuChungs.RemoveRange(currentLinks.Where(x => !newIds.Contains(x.MaBenh)));
+
+            var currentIds = currentLinks.Select(x => x.MaBenh).ToHashSet();
+            var validNewIds = await _context.Benhs
+                .Where(x => newIds.Contains(x.MaBenh) && x.DeleteAt == null)
+                .Select(x => x.MaBenh)
+                .ToListAsync();
+
+            foreach (var diseaseId in validNewIds.Where(id => !currentIds.Contains(id)))
+            {
+                _context.BenhTrieuChungs.Add(new BenhTrieuChung
+                {
+                    MaBenh = diseaseId,
+                    MaTrieuChung = symptomId,
+                    TrongSo = 3
+                });
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

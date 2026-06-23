@@ -75,7 +75,7 @@
 
                         <div class="portal-field">
                             <label for="email">Email</label>
-                            <input class="portal-input" id="email" name="email" type="email" placeholder="admin@medpredict.vn" required>
+                            <input class="portal-input" id="email" name="email" type="email" required>
                         </div>
 
                         <div class="portal-field">
@@ -85,12 +85,6 @@
 
                         <button class="portal-button portal-button-primary btn-login" type="submit">
                             Đăng nhập
-                        </button>
-
-                        <button class="portal-button portal-button-dark"
-                                type="button"
-                                onclick="window.location.href='@Url.Action("DangNhap", "Account", new { returnUrl = Url.Action("Dashboard", "Portal", new { area = "Admin" }) })'">
-                            Đăng nhập vào dashboard admin
                         </button>
                     </form>
 

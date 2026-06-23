@@ -34,13 +34,16 @@
                     <th>Hoạt chất</th>
                     <th>Nhóm thuốc</th>
                     <th>Liều dùng</th>
+                    <th>Tác dụng phụ</th>
+                    <th>Lưu ý</th>
+                    <th>Chống chỉ định / cảnh báo</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody id="medicineTable">
                 <tr>
-                    <td colspan="7">Đang tải dữ liệu...</td>
+                    <td colspan="10">Đang tải dữ liệu...</td>
                 </tr>
             </tbody>
         </table>
@@ -80,6 +83,9 @@
 
             <label for="sideEffects">Tác dụng phụ</label>
             <textarea id="sideEffects" rows="3"></textarea>
+
+            <label for="contraindications">Chống chỉ định / cảnh báo</label>
+            <textarea id="contraindications" rows="4" readonly></textarea>
 
             <label for="notes">Lưu ý</label>
             <textarea id="notes" rows="3"></textarea>

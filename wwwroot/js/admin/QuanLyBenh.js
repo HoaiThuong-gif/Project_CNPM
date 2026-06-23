@@ -2,6 +2,7 @@ const diseaseRoot = document.querySelector(".main");
 
 if (diseaseRoot) {
     const apiUrl = diseaseRoot.dataset.diseaseApi;
+    const symptomApiUrl = diseaseRoot.dataset.symptomApi;
     const loginUrl = diseaseRoot.dataset.loginUrl;
     const token = localStorage.getItem("token");
     const tableBody = document.getElementById("benhTable");
@@ -18,7 +19,9 @@ if (diseaseRoot) {
     const diseaseGroupInput = document.getElementById("diseaseGroup");
     const diseaseDescriptionInput = document.getElementById("diseaseDescription");
     const diseaseSeverityInput = document.getElementById("diseaseSeverity");
+    const diseaseSymptomsInput = document.getElementById("diseaseSymptoms");
     let diseases = [];
+    let symptoms = [];
     let editingDisease = null;
 
     const request = async (url, options = {}) => {
@@ -62,6 +65,10 @@ if (diseaseRoot) {
         diseaseGroupInput.value = disease?.diseaseGroup || "";
         diseaseDescriptionInput.value = disease?.description || "";
         diseaseSeverityInput.value = String(disease?.severityLevel || 1);
+        const selectedSymptomIds = new Set((disease?.symptomIds || []).map((id) => Number(id)));
+        [...diseaseSymptomsInput.options].forEach((option) => {
+            option.selected = selectedSymptomIds.has(Number(option.value));
+        });
         modal.classList.remove("hidden");
     };
 
@@ -74,7 +81,7 @@ if (diseaseRoot) {
 
     const renderDiseases = (source) => {
         if (!source.length) {
-            tableBody.innerHTML = '<tr><td colspan="7">Không có dữ liệu bệnh.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="9">Không có dữ liệu bệnh.</td></tr>';
             return;
         }
 
@@ -83,6 +90,8 @@ if (diseaseRoot) {
                 <td>#B${String(disease.diseaseId).padStart(3, "0")}</td>
                 <td>${disease.diseaseName || ""}</td>
                 <td>${disease.diseaseGroup || ""}</td>
+                <td>${disease.description || ""}</td>
+                <td>${(disease.symptoms || []).map((symptom) => symptom.symptomName).join(", ")}</td>
                 <td><span class="level ${disease.severityLevel === 3 ? "high" : disease.severityLevel === 2 ? "medium" : "low"}">${levelLabel(disease.severityLevel)}</span></td>
                 <td>${disease.isActive ? "Hoạt động" : "Ngừng hoạt động"}</td>
                 <td>${formatDate(disease.createdAt)}</td>
@@ -101,6 +110,16 @@ if (diseaseRoot) {
         renderDiseases(diseases);
     };
 
+    const loadSymptoms = async () => {
+        const response = await request(symptomApiUrl, { method: "GET" });
+        const data = await response.json();
+        symptoms = Array.isArray(data) ? data : [];
+        diseaseSymptomsInput.innerHTML = symptoms
+            .filter((symptom) => symptom.isActive !== false)
+            .map((symptom) => `<option value="${symptom.symptomId}">${symptom.symptomName}</option>`)
+            .join("");
+    };
+
     createButton.addEventListener("click", () => openModal());
     closeModalButton.addEventListener("click", closeModal);
     cancelModalButton.addEventListener("click", closeModal);
@@ -115,7 +134,8 @@ if (diseaseRoot) {
             diseaseName: diseaseNameInput.value.trim(),
             diseaseGroup: diseaseGroupInput.value.trim(),
             description: diseaseDescriptionInput.value.trim(),
-            severityLevel: Number(diseaseSeverityInput.value || 1)
+            severityLevel: Number(diseaseSeverityInput.value || 1),
+            symptomIds: [...diseaseSymptomsInput.selectedOptions].map((option) => Number(option.value))
         };
 
         if (!payload.diseaseName || !payload.diseaseGroup) {
@@ -187,16 +207,17 @@ if (diseaseRoot) {
             return [
                 disease.diseaseName,
                 disease.diseaseGroup,
-                disease.description
+                disease.description,
+                ...(disease.symptoms || []).map((symptom) => symptom.symptomName)
             ].join(" ").toLowerCase().includes(filter);
         });
 
         renderDiseases(filtered);
     });
 
-    loadDiseases().catch((error) => {
+    Promise.all([loadSymptoms(), loadDiseases()]).catch((error) => {
         if (error.message !== "Unauthorized") {
-            tableBody.innerHTML = '<tr><td colspan="7">Không thể tải dữ liệu bệnh.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="9">Không thể tải dữ liệu bệnh.</td></tr>';
         }
     });
 }

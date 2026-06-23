@@ -21,7 +21,18 @@ namespace Project_CNPM.Area.Admin.Services
                 TotalActiveUsers = await _context.NguoiDungs.CountAsync(u => u.DeleteAt == null && u.VaiTro == "User"),
                 TotalActiveMedicines = await _context.Thuocs.CountAsync(t => t.DangHoatDong == true),
                 TotalActiveDiseases = await _context.Benhs.CountAsync(b => b.DeleteAt == null && b.DangHoatDong == true),
-                TotalPredictionsMade = await _context.LichSuDuDoans.CountAsync()
+                TotalPredictionsMade = await _context.LichSuDuDoans.CountAsync(),
+                TopSearchedMedicines = await _context.KetQuaDuDoans
+                    .Where(k => k.TenThuocSnapshot != null)
+                    .GroupBy(k => k.TenThuocSnapshot!)
+                    .Select(g => new TopSearchedMedicineDto
+                    {
+                        MedicineName = g.Key,
+                        SearchCount = g.Count()
+                    })
+                    .OrderByDescending(x => x.SearchCount)
+                    .Take(5)
+                    .ToListAsync()
             };
         }
     }

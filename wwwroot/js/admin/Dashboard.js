@@ -13,6 +13,7 @@ if (dashboardRoot) {
     const totalDiseases = document.getElementById("totalDiseases");
     const viewAllButton = document.getElementById("btnViewAllUsers");
     const recentUsersTable = document.getElementById("recentUsersTable");
+    const topMedicinesTable = document.getElementById("topMedicinesTable");
     const cards = document.querySelectorAll(".card");
 
     const formatNumber = (value) => Number(value || 0).toLocaleString("vi-VN");
@@ -47,6 +48,19 @@ if (dashboardRoot) {
         totalPredictions.textContent = formatNumber(stats.totalPredictionsMade);
         totalMedicines.textContent = formatNumber(stats.totalActiveMedicines);
         totalDiseases.textContent = formatNumber(stats.totalActiveDiseases);
+
+        if (topMedicinesTable) {
+            const topMedicines = Array.isArray(stats.topSearchedMedicines) ? stats.topSearchedMedicines : [];
+            topMedicinesTable.innerHTML = topMedicines.length
+                ? topMedicines.map((medicine, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${medicine.medicineName || ""}</td>
+                        <td>${formatNumber(medicine.searchCount)}</td>
+                    </tr>
+                `).join("")
+                : '<tr><td colspan="3">Chua co du lieu tra cuu thuoc.</td></tr>';
+        }
     };
 
     const renderRecentUsers = (users) => {

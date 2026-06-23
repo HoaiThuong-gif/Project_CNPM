@@ -26,6 +26,7 @@ if (medicineRoot) {
         dosage: document.getElementById("dosage"),
         howToUse: document.getElementById("howToUse"),
         sideEffects: document.getElementById("sideEffects"),
+        contraindications: document.getElementById("contraindications"),
         notes: document.getElementById("notes"),
         requiresPrescription: document.getElementById("requiresPrescription")
     };
@@ -79,6 +80,7 @@ if (medicineRoot) {
         fields.dosage.value = medicine?.dosage || "";
         fields.howToUse.value = medicine?.howToUse || "";
         fields.sideEffects.value = medicine?.sideEffects || "";
+        fields.contraindications.value = medicine?.contraindications || "Chưa có dữ liệu cảnh báo riêng cho thuốc này.";
         fields.notes.value = medicine?.notes || "";
         fields.requiresPrescription.checked = Boolean(medicine?.requiresPrescription);
         modal.classList.remove("hidden");
@@ -92,7 +94,7 @@ if (medicineRoot) {
 
     const renderMedicines = (source) => {
         if (!source.length) {
-            tableBody.innerHTML = '<tr><td colspan="7">Không có dữ liệu thuốc.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10">Không có dữ liệu thuốc.</td></tr>';
             return;
         }
 
@@ -103,6 +105,9 @@ if (medicineRoot) {
                 <td>${medicine.activeIngredient || ""}</td>
                 <td>${medicine.medicineGroup || ""}</td>
                 <td>${medicine.dosage || ""}</td>
+                <td>${medicine.sideEffects || ""}</td>
+                <td>${medicine.notes || ""}</td>
+                <td>${medicine.contraindications || "Chưa có dữ liệu"}</td>
                 <td><span class="status ${medicine.isActive ? "active" : "out"}">${medicine.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}</span></td>
                 <td>
                     <button class="edit-btn" type="button" data-action="edit" data-id="${medicine.medicineId}">Sửa</button>
@@ -122,7 +127,10 @@ if (medicineRoot) {
             const matchesKeyword = [
                 medicine.medicineName,
                 medicine.activeIngredient,
-                medicine.medicineGroup
+                medicine.medicineGroup,
+                medicine.sideEffects,
+                medicine.notes,
+                medicine.contraindications
             ].join(" ").toLowerCase().includes(keyword);
 
             const matchesStatus = !status || String(medicine.isActive) === status;
@@ -217,7 +225,7 @@ if (medicineRoot) {
 
     loadMedicines().catch((error) => {
         if (error.message !== "Unauthorized") {
-            tableBody.innerHTML = '<tr><td colspan="7">Không thể tải dữ liệu thuốc.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10">Không thể tải dữ liệu thuốc.</td></tr>';
         }
     });
 }

@@ -44,11 +44,12 @@ CREATE TABLE Benh (
 );
 GO
 
-INSERT INTO Benh (TenBenh, NhomBenh, MucDoNghiemTrong, DangHoatDong) VALUES (N'Cảm cúm', N'Hô hấp', 1, 1),
-                                                                            (N'Đau đầu', N'Thần kinh', 1, 1),
-                                                                            (N'Tiêu chảy', N'Tiêu hoá', 1, 1),
-                                                                            (N'Dị ứng / Mề đay', N'Da liễu', 1, 1),
-                                                                            (N'Đau dạ dày', N'Tiêu hoá', 2, 1);
+INSERT INTO Benh (TenBenh, MoTa, NhomBenh, MucDoNghiemTrong, DangHoatDong) VALUES
+    (N'Cảm cúm', N'Bệnh nhiễm siêu vi đường hô hấp trên, thường gây sốt nhẹ, đau họng, ho, sổ mũi, hắt hơi và mệt mỏi. Phần lớn trường hợp tự cải thiện sau vài ngày nếu nghỉ ngơi, uống đủ nước và theo dõi triệu chứng.', N'Hô hấp', 1, 1),
+    (N'Đau đầu', N'Tình trạng đau hoặc căng tức vùng đầu, có thể liên quan căng thẳng, thiếu ngủ, cảm cúm, đau cơ vùng cổ vai gáy hoặc các nguyên nhân khác. Cần đi khám nếu đau dữ dội đột ngột, kéo dài hoặc kèm dấu hiệu thần kinh.', N'Thần kinh', 1, 1),
+    (N'Tiêu chảy', N'Tình trạng đi ngoài phân lỏng nhiều lần trong ngày, có thể kèm đau bụng, buồn nôn, mất nước hoặc sốt. Ưu tiên bù nước và theo dõi dấu hiệu mất nước, phân máu hoặc sốt cao.', N'Tiêu hoá', 1, 1),
+    (N'Dị ứng / Mề đay', N'Phản ứng quá mẫn biểu hiện bằng ngứa da, nổi mẩn đỏ, mề đay, phát ban, hắt hơi hoặc chảy nước mắt. Cần cảnh giác nếu có khó thở, phù môi mắt hoặc choáng.', N'Da liễu', 1, 1),
+    (N'Đau dạ dày', N'Tình trạng đau rát thượng vị, ợ chua, khó tiêu, đầy hơi hoặc buồn nôn, thường liên quan tăng acid, kích ứng niêm mạc hoặc rối loạn tiêu hoá. Cần thận trọng với thuốc NSAID và dấu hiệu xuất huyết tiêu hoá.', N'Tiêu hoá', 2, 1);
 
 -- =========================
 -- 3. BẢNG TRIỆU CHỨNG
@@ -213,6 +214,83 @@ CREATE TABLE ThuocThanhPhan (
     PRIMARY KEY (MaThuoc, MaThanhPhan),
     FOREIGN KEY (MaThuoc)       REFERENCES Thuoc(MaThuoc),
     FOREIGN KEY (MaThanhPhan)   REFERENCES ThanhPhan(MaThanhPhan)
+);
+GO
+
+INSERT INTO ThanhPhan (TenThanhPhan)
+SELECT src.TenThanhPhan
+FROM (VALUES
+    (N'Paracetamol'),
+    (N'Ibuprofen'),
+    (N'Cetirizine'),
+    (N'Dextromethorphan'),
+    (N'Acid ascorbic'),
+    (N'Acid acetylsalicylic'),
+    (N'Cafein'),
+    (N'Methyl salicylate'),
+    (N'Menthol'),
+    (N'Muối bù điện giải ORS'),
+    (N'Loperamide'),
+    (N'Diosmectite'),
+    (N'Lactobacillus acidophilus'),
+    (N'Berberin clorid'),
+    (N'Loratadine'),
+    (N'Chlorpheniramine maleate'),
+    (N'Hydrocortisone'),
+    (N'Fexofenadine'),
+    (N'Calamine'),
+    (N'Kẽm oxit'),
+    (N'Aluminium hydroxide'),
+    (N'Magnesium hydroxide'),
+    (N'Omeprazole'),
+    (N'Simethicone'),
+    (N'Sucralfate'),
+    (N'Domperidone')
+) AS src(TenThanhPhan)
+WHERE NOT EXISTS (
+    SELECT 1 FROM ThanhPhan tp WHERE tp.TenThanhPhan = src.TenThanhPhan
+);
+GO
+
+INSERT INTO ThuocThanhPhan (MaThuoc, MaThanhPhan)
+SELECT t.MaThuoc, tp.MaThanhPhan
+FROM (VALUES
+    (N'Paracetamol 500mg', N'Paracetamol'),
+    (N'Ibuprofen 200mg', N'Ibuprofen'),
+    (N'Cetirizine 10mg', N'Cetirizine'),
+    (N'Dextromethorphan 15mg', N'Dextromethorphan'),
+    (N'Vitamin C 500mg', N'Acid ascorbic'),
+    (N'Ibuprofen 400mg', N'Ibuprofen'),
+    (N'Aspirin 500mg', N'Acid acetylsalicylic'),
+    (N'Cafein kết hợp Paracetamol', N'Paracetamol'),
+    (N'Cafein kết hợp Paracetamol', N'Cafein'),
+    (N'Cao dán giảm đau Salonpas', N'Methyl salicylate'),
+    (N'Cao dán giảm đau Salonpas', N'Menthol'),
+    (N'Oresol', N'Muối bù điện giải ORS'),
+    (N'Loperamide 2mg', N'Loperamide'),
+    (N'Smecta (Diosmectite)', N'Diosmectite'),
+    (N'Men vi sinh Probiotic', N'Lactobacillus acidophilus'),
+    (N'Berberin 50mg', N'Berberin clorid'),
+    (N'Loratadine 10mg', N'Loratadine'),
+    (N'Chlorpheniramine 4mg', N'Chlorpheniramine maleate'),
+    (N'Kem bôi Hydrocortisone 1%', N'Hydrocortisone'),
+    (N'Fexofenadine 60mg', N'Fexofenadine'),
+    (N'Calamine Lotion', N'Calamine'),
+    (N'Calamine Lotion', N'Kẽm oxit'),
+    (N'Antacid (Nhôm hydroxit + Magie hydroxit)', N'Aluminium hydroxide'),
+    (N'Antacid (Nhôm hydroxit + Magie hydroxit)', N'Magnesium hydroxide'),
+    (N'Omeprazole 20mg (OTC)', N'Omeprazole'),
+    (N'Simethicone 80mg', N'Simethicone'),
+    (N'Sucralfate 1g', N'Sucralfate'),
+    (N'Domperidone 10mg', N'Domperidone')
+) AS src(TenThuoc, TenThanhPhan)
+JOIN Thuoc t ON t.TenThuoc = src.TenThuoc
+JOIN ThanhPhan tp ON tp.TenThanhPhan = src.TenThanhPhan
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM ThuocThanhPhan existing
+    WHERE existing.MaThuoc = t.MaThuoc
+      AND existing.MaThanhPhan = tp.MaThanhPhan
 );
 GO
 

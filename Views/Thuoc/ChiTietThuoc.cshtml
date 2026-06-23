@@ -53,6 +53,10 @@
 
                     <div class="portal-stat-grid">
                         <div class="portal-stat-card">
+                            <strong>Thành phần</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.Components) ? "Chưa có dữ liệu." : Model.Components)</span>
+                        </div>
+                        <div class="portal-stat-card">
                             <strong>Hoạt chất</strong>
                             <span>@(string.IsNullOrWhiteSpace(Model.ActiveIngredient) ? "Chưa có dữ liệu." : Model.ActiveIngredient)</span>
                         </div>
@@ -71,6 +75,10 @@
                         <div class="portal-stat-card">
                             <strong>Tác dụng phụ</strong>
                             <span>@(string.IsNullOrWhiteSpace(Model.SideEffects) ? "Chưa có dữ liệu." : Model.SideEffects)</span>
+                        </div>
+                        <div class="portal-stat-card">
+                            <strong>Chống chỉ định / cảnh báo</strong>
+                            <span>@(string.IsNullOrWhiteSpace(Model.Contraindications) ? "Chưa có dữ liệu cảnh báo riêng." : Model.Contraindications)</span>
                         </div>
                         <div class="portal-stat-card">
                             <strong>Lưu ý</strong>

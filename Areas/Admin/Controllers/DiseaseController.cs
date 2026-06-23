@@ -1,7 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_CNPM.Area.Admin.DTOs;
 using Project_CNPM.Area.Admin.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Project_CNPM.Area.Admin.Controllers
 {
@@ -21,57 +21,62 @@ namespace Project_CNPM.Area.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDiseases()
         {
-            var diseases = await _diseaseAdminService.GetAllDiseasesAsync(true);
-            
+            var isAdmin = User.IsInRole("Admin");
+            var diseases = await _diseaseAdminService.GetAllDiseasesAsync(isAdmin);
+
+            if (!isAdmin)
+            {
+                diseases = diseases.Where(d => d.IsActive);
+            }
+
             return Ok(diseases);
         }
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDiseasesById(int id)
         {
-            var diseases = await _diseaseAdminService.GetDiseaseByIdAsync(id);
+            var disease = await _diseaseAdminService.GetDiseaseByIdAsync(id);
 
-            if (diseases == null)
-                return NotFound(new { message = "Không tìm thấy bệnh"});
+            if (disease == null || (!User.IsInRole("Admin") && !disease.IsActive))
+                return NotFound(new { message = "Khong tim thay benh" });
 
-            return Ok(diseases);
+            return Ok(disease);
         }
 
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateDisease([FromBody] DiseaseCreateDto disease)
         {
             var result = await _diseaseAdminService.CreateDiseaseAsync(disease);
-           
+
             if (!result.IsSuccess)
-                return BadRequest(new {message = result.Message});
-            
-            return Ok(new {message = result.Message});
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
 
-        [Authorize(Roles="Admin")]
-        [HttpPatch("Update")]
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("update")]
         public async Task<IActionResult> UpdateDisease([FromBody] DiseaseUpdateDto disease)
         {
             var result = await _diseaseAdminService.UpdateDiseaseAsync(disease);
 
             if (!result.IsSuccess)
-                return BadRequest(new {message = result.Message});
-            
-            return Ok(new {message = result.Message});
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
 
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPatch("toggle")]
         public async Task<IActionResult> DeleteDisease(int id)
         {
             var result = await _diseaseAdminService.ToggleDiseaseAsync(id);
 
             if (!result.IsSuccess)
-                return BadRequest(new {message = result.Message});
-            
-            return Ok(new {message = result.Message});
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
     }
 }

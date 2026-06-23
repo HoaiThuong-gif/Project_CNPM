@@ -9,6 +9,7 @@
          data-results-key="predictionResults"
          data-back-url="@Url.Action("NhapThongTinBenh", "DuDoan")"
          data-feedback-url="/api/UserPrediction/feedback"
+         data-history-url="/api/UserPrediction/history"
          data-login-url="@Url.Action("DangNhap", "Account")"
          data-medicine-detail-url="@Url.Action("ChiTietThuoc", "Thuoc", new { id = "__ID__" })">
     <div class="user-page-header">
@@ -21,6 +22,11 @@
     <div class="user-warning-banner">
         <strong>Cảnh báo quan trọng:</strong> Kết quả gợi ý thuốc chỉ mang tính tham khảo, không thay thế tư vấn, chẩn đoán hoặc chỉ định điều trị từ bác sĩ, dược sĩ hoặc nhân viên y tế có chuyên môn.
     </div>
+
+    <section class="user-summary-card" id="predictionSafetyPanel" style="display:none;margin-bottom:18px;">
+        <h2 class="user-section-title">Chống chỉ định / cảnh báo an toàn</h2>
+        <div id="predictionSafetyList" class="user-warning-list"></div>
+    </section>
 
     <div class="user-grid">
         <div class="user-column">

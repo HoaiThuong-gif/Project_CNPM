@@ -6,6 +6,7 @@
 
 <section class="admin-page-shell main"
          data-symptom-api="/api/Symptom"
+         data-disease-api="/api/Disease"
          data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
     <div class="admin-page-header">
         <div>
@@ -32,6 +33,7 @@
                     <th>Mã</th>
                     <th>Tên triệu chứng</th>
                     <th>Mô tả</th>
+                    <th>Bệnh liên quan</th>
                     <th>Trạng thái</th>
                     <th>Ngày tạo</th>
                     <th>Thao tác</th>
@@ -39,7 +41,7 @@
             </thead>
             <tbody id="symptomTable">
                 <tr>
-                    <td colspan="6">Đang tải dữ liệu...</td>
+                    <td colspan="7">Đang tải dữ liệu...</td>
                 </tr>
             </tbody>
         </table>
@@ -61,6 +63,9 @@
 
             <label for="symptomDescription">Mô tả</label>
             <textarea id="symptomDescription" rows="4"></textarea>
+
+            <label for="symptomDiseases">Bệnh liên quan</label>
+            <select id="symptomDiseases" multiple size="6"></select>
 
             <div class="modal-actions">
                 <button type="button" class="secondary-btn" id="btnCancelSymptomModal">Hủy</button>

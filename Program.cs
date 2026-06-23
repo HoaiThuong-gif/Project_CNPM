@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Project_CNPM.Area.Admin.Services;
 using Project_CNPM.Data;
+using Project_CNPM.Models;
 using Project_CNPM.Services;
 using System.Text;
 
@@ -75,6 +76,43 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var admin = db.NguoiDungs.FirstOrDefault(u => u.Email == "admin@example.com");
+        const string defaultAdminPassword = "Admin@123";
+
+        if (admin == null)
+        {
+            db.NguoiDungs.Add(new NguoiDung
+            {
+                HoTen = "Quan tri vien",
+                Email = "admin@example.com",
+                MatKhauMaHoa = BCrypt.Net.BCrypt.HashPassword(defaultAdminPassword),
+                VaiTro = "Admin",
+                BiKhoa = false,
+                NgayTao = DateTime.Now
+            });
+        }
+        else if (string.IsNullOrWhiteSpace(admin.MatKhauMaHoa) || !admin.MatKhauMaHoa.StartsWith("$2"))
+        {
+            admin.MatKhauMaHoa = BCrypt.Net.BCrypt.HashPassword(defaultAdminPassword);
+            admin.VaiTro = "Admin";
+            admin.BiKhoa = false;
+            admin.DeleteAt = null;
+        }
+
+        db.SaveChanges();
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Could not seed default admin account. Make sure the database is created and reachable.");
+    }
+}
 
 if (!app.Environment.IsDevelopment())
 {

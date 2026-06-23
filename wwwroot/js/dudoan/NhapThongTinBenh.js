@@ -205,16 +205,6 @@ if (form) {
         submitButton.textContent = "Đang dự đoán...";
         showNotice("Đang gửi dữ liệu lên hệ thống để phân tích...", "#1d4ed8", "#eff6ff");
 
-        const symptomPayload = [
-            `Triệu chứng chính: ${symptoms}`,
-            `Mức độ triệu chứng: ${severity}`,
-            patientAgeInput?.value.trim() ? `Tuổi: ${patientAgeInput.value.trim()}` : "",
-            patientGenderInput?.value ? `Giới tính: ${patientGenderInput.value}` : "",
-            allergies.length ? `Dị ứng thuốc: ${allergies.join(", ")}` : "",
-            backgroundDiseases.length ? `Bệnh nền: ${backgroundDiseases.join(", ")}` : "",
-            currentMedicines.length ? `Thuốc đang sử dụng: ${currentMedicines.join(", ")}` : ""
-        ].filter(Boolean).join(". ");
-
         try {
             const response = await fetch(predictUrl, {
                 method: "POST",
@@ -224,7 +214,13 @@ if (form) {
                 },
                 body: JSON.stringify({
                     diseaseId,
-                    symptoms: symptomPayload
+                    symptoms,
+                    severity,
+                    age: patientAgeInput?.value.trim() ? Number(patientAgeInput.value.trim()) : null,
+                    gender: patientGenderInput?.value || null,
+                    allergies,
+                    backgroundDiseases,
+                    currentMedicines
                 })
             });
 

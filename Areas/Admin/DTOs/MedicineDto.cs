@@ -11,6 +11,8 @@ namespace  Project_CNPM.Area.Admin.DTOs
         public string HowToUse { get; set; } = string.Empty; // CachDung
         public string SideEffects { get; set; } = string.Empty; // TacDungPhu
         public string Notes { get; set; } = string.Empty; // LuuY
+        public string Components { get; set; } = string.Empty;
+        public string Contraindications { get; set; } = string.Empty;
         public bool RequiresPrescription { get; set; } // CanKeDon
     }
 
