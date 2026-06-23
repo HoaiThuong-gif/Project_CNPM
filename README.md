@@ -1,26 +1,48 @@
-# PROJECT_CNPM
+# Project_CNPM
 
-## Khởi tạo hệ thống
+Huong dan khoi dong va chay du an.
 
-### Dựng container và tạo database
+## 1. Khoi dong database
 
-```bash
+Mo terminal tai thu muc goc du an va chay:
+
+```powershell
 docker-compose up -d
-docker exec -it project_cnpm /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Kh@ng09102005" -C -i /SQL.sql
 ```
 
-## Chạy dự án
+Tao database va import du lieu:
 
-Mở hai terminal riêng.
-
-### Terminal 1: Chạy backend Python
-
-```bash
-py .\src\app.py
+```powershell
+docker exec -it cnpm_server /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Kh@ng09102005" -C -i /SQL.sql
 ```
 
-### Terminal 2: Chạy ứng dụng .NET
+## 2. Cai thu vien Python
 
-```bash
+```powershell
+pip install -r requirement.txt
+```
+
+## 3. Chay backend Python
+
+Mo terminal thu nhat:
+
+```powershell
+python .\src\app.py
+```
+
+Backend Python chay tai:
+
+```text
+http://localhost:5000
+```
+
+## 4. Chay ung dung .NET
+
+Mo terminal thu hai:
+
+```powershell
+dotnet restore
 dotnet watch run
 ```
+
+Sau khi chay thanh cong, mo duong dan hien tren terminal de vao website.

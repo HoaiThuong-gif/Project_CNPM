@@ -1,5 +1,10 @@
 bin/
 obj/
+tmpbuild/
+tmpbuild-admincheck/
+tmpbuild-dataset/
+tmpbuild-disease-admin/
+tmpbuild-medicine-admin/
 
 .vs/
 .vscode/
