@@ -1,0 +1,80 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý triệu chứng";
+    ViewData["AdminSection"] = "Quản lý triệu chứng";
+}
+
+<section class="admin-page-shell main"
+         data-symptom-api="/api/Symptom"
+         data-disease-api="/api/Disease"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">Quản lý triệu chứng</p>
+            <h1 class="admin-page-title">Quản lý triệu chứng</h1>
+            <p class="admin-page-subtitle">Cập nhật danh mục triệu chứng và trạng thái hiển thị trong hệ thống.</p>
+        </div>
+        <button class="add-btn" id="btnCreateSymptom" type="button">+ Thêm triệu chứng</button>
+    </div>
+
+    <section class="table-wrapper">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm triệu chứng...">
+            <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="true">Hoạt động</option>
+                <option value="false">Tạm ẩn</option>
+            </select>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên triệu chứng</th>
+                    <th>Mô tả</th>
+                    <th>Bệnh liên quan</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="symptomTable">
+                <tr>
+                    <td colspan="7">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+<div class="modal-backdrop hidden" id="symptomModalBackdrop">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="symptomModalTitle">Thêm triệu chứng</h2>
+            <button type="button" class="modal-close" id="btnCloseSymptomModal">×</button>
+        </div>
+
+        <form id="symptomForm" class="modal-form">
+            <input type="hidden" id="symptomId">
+
+            <label for="symptomName">Tên triệu chứng</label>
+            <input id="symptomName" type="text" required>
+
+            <label for="symptomDescription">Mô tả</label>
+            <textarea id="symptomDescription" rows="4"></textarea>
+
+            <label for="symptomDiseases">Bệnh liên quan</label>
+            <select id="symptomDiseases" multiple size="6"></select>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="btnCancelSymptomModal">Hủy</button>
+                <button type="submit" class="primary-btn">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/QuanLyTrieuChung.js" asp-append-version="true"></script>
+}

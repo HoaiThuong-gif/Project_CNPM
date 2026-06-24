@@ -1,0 +1,44 @@
+:root{
+
+    /* MÀU CHỦ ĐẠO */
+
+    --xanhDuongNhat: #7dd3fc;
+    --xanhDuong: #38bdf8;
+    --xanhDuongDam: #0ea5e9;
+
+    --hongNhat: #fbcfe8;
+    --hong: #ec4899;
+
+    --trang: #ffffff;
+
+    /* TEXT */
+
+    --textDam: #0f172a;
+    --textThuong: #334155;
+    --textNhat: #64748b;
+
+    /* BACKGROUND */
+
+    --bgMain: #f5fbff;
+    --bgCard: #ffffff;
+
+    /* BORDER */
+
+    --border: #e2e8f0;
+
+    /* SHADOW */
+
+    --shadowNhe: 0 4px 15px rgba(0,0,0,0.05);
+
+    --shadowCard: 0 10px 40px rgba(56,189,248,0.08);
+
+    --shadowButton: 0 10px 25px rgba(56,189,248,0.2);
+
+    /* GRADIENT */
+
+    --gradientMain: linear-gradient(
+        135deg,
+        #7dd3fc,
+        #f9a8d4
+    );
+}

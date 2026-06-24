@@ -1,0 +1,108 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý thuốc";
+    ViewData["AdminSection"] = "Quản lý thuốc";
+}
+
+<section class="admin-page-shell main"
+         data-medicine-api="/api/Medicine"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">Quản lý thuốc</p>
+            <h1 class="admin-page-title">Quản lý thuốc</h1>
+            <p class="admin-page-subtitle">Tra cứu, cập nhật và quản lý danh mục thuốc trong hệ thống.</p>
+        </div>
+        <button class="add-btn" id="btnCreateMedicine" type="button">+ Thêm thuốc</button>
+    </div>
+
+    <section class="table-wrapper">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc hoạt chất...">
+            <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="true">Hoạt động</option>
+                <option value="false">Ngừng hoạt động</option>
+            </select>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã thuốc</th>
+                    <th>Tên thuốc</th>
+                    <th>Hoạt chất</th>
+                    <th>Nhóm thuốc</th>
+                    <th>Liều dùng</th>
+                    <th>Tác dụng phụ</th>
+                    <th>Lưu ý</th>
+                    <th>Chống chỉ định / cảnh báo</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="medicineTable">
+                <tr>
+                    <td colspan="10">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+<div class="modal-backdrop hidden" id="medicineModalBackdrop">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="medicineModalTitle">Thêm thuốc</h2>
+            <button type="button" class="modal-close" id="btnCloseMedicineModal">×</button>
+        </div>
+
+        <form id="medicineForm" class="modal-form">
+            <input type="hidden" id="medicineId">
+
+            <label for="medicineName">Tên thuốc</label>
+            <input id="medicineName" type="text" required>
+
+            <label for="activeIngredient">Hoạt chất</label>
+            <input id="activeIngredient" type="text">
+
+            <label for="medicineGroup">Nhóm thuốc</label>
+            <input id="medicineGroup" type="text">
+
+            <label for="dosageForm">Dạng bào chế</label>
+            <input id="dosageForm" type="text">
+
+            <label for="uses">Công dụng</label>
+            <textarea id="uses" rows="3"></textarea>
+
+            <label for="dosage">Liều dùng</label>
+            <input id="dosage" type="text">
+
+            <label for="howToUse">Cách dùng</label>
+            <textarea id="howToUse" rows="3"></textarea>
+
+            <label for="sideEffects">Tác dụng phụ</label>
+            <textarea id="sideEffects" rows="3"></textarea>
+
+            <label for="contraindications">Chống chỉ định / cảnh báo</label>
+            <textarea id="contraindications" rows="4" readonly></textarea>
+
+            <label for="notes">Lưu ý</label>
+            <textarea id="notes" rows="3"></textarea>
+
+            <label class="checkbox-row">
+                <input id="requiresPrescription" type="checkbox">
+                Cần kê đơn
+            </label>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="btnCancelMedicineModal">Hủy</button>
+                <button type="submit" class="primary-btn" id="btnSubmitMedicineModal">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/QuanLyThuoc.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,73 @@
+@{
+    Layout = "~/Views/Shared/_UserPortalLayout.cshtml";
+    ViewData["Title"] = "Kết quả dự đoán";
+    ViewData["UserSection"] = "Dự đoán thuốc";
+}
+
+<section class="result-container"
+         data-input-key="predictionInput"
+         data-results-key="predictionResults"
+         data-back-url="@Url.Action("NhapThongTinBenh", "DuDoan")"
+         data-feedback-url="/api/UserPrediction/feedback"
+         data-history-url="/api/UserPrediction/history"
+         data-login-url="@Url.Action("DangNhap", "Account")"
+         data-medicine-detail-url="@Url.Action("ChiTietThuoc", "Thuoc", new { id = "__ID__" })">
+    <div class="user-page-header">
+        <div>
+            <h1 class="user-page-title">Dự đoán thuốc phù hợp</h1>
+            <p class="user-page-subtitle">Nhập bệnh và thông tin sức khỏe để nhận gợi ý thuốc cá nhân hóa.</p>
+        </div>
+    </div>
+
+    <div class="user-warning-banner">
+        <strong>Cảnh báo quan trọng:</strong> Kết quả gợi ý thuốc chỉ mang tính tham khảo, không thay thế tư vấn, chẩn đoán hoặc chỉ định điều trị từ bác sĩ, dược sĩ hoặc nhân viên y tế có chuyên môn.
+    </div>
+
+    <section class="user-summary-card" id="predictionSafetyPanel" style="display:none;margin-bottom:18px;">
+        <h2 class="user-section-title">Chống chỉ định / cảnh báo an toàn</h2>
+        <div id="predictionSafetyList" class="user-warning-list"></div>
+    </section>
+
+    <div class="user-grid">
+        <div class="user-column">
+            <section class="user-summary-card">
+                <h2 class="user-section-title">Thông tin đã nhập</h2>
+                <ul id="predictionInputSummary" style="margin:0;padding-left:18px;line-height:1.8;">
+                    <li>Chưa có dữ liệu dự đoán.</li>
+                </ul>
+            </section>
+
+            <section class="user-summary-card">
+                <h2 class="user-section-title">Khuyến nghị</h2>
+                <p id="predictionRecommendation" style="margin:0;line-height:1.7;color:#42566b;">
+                    Hãy nhập thông tin dự đoán ở bước trước để xem kết quả từ backend.
+                </p>
+            </section>
+        </div>
+
+        <div class="user-column">
+            <section class="user-result-panel">
+                <div class="user-result-header">
+                    <div>
+                        <span class="user-result-badge" id="predictionStatus">Chưa có kết quả</span>
+                        <h2 class="user-result-title" id="predictionTitle">Chưa có dữ liệu</h2>
+                        <p class="user-result-meta" id="predictionDescription">
+                            Sau khi gửi API dự đoán thành công, kết quả sẽ được hiển thị tại đây.
+                        </p>
+                    </div>
+                    <div class="user-timestamp" id="predictionTimestamp">@DateTime.Now.ToString("HH:mm:ss")</div>
+                </div>
+
+                <div id="predictionResultsList" class="user-medicine-list">
+                    <div class="user-empty-state">Chưa có dữ liệu</div>
+                </div>
+
+                <button class="btn-save" id="btnBackToPredict" type="button">Quay lại nhập thông tin</button>
+            </section>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/dudoan/KetQuaDuDoan.js" asp-append-version="true"></script>
+}

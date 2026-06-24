@@ -1,0 +1,59 @@
+@media(max-width:1200px){
+
+    .header{
+        padding: 0 40px;
+    }
+
+    .main-title{
+        font-size: 42px;
+    }
+}
+
+@media(max-width:1000px){
+
+    .menu{
+        display: none;
+    }
+
+    .header{
+        padding: 0 20px;
+    }
+
+    .main-title{
+        font-size: 35px;
+    }
+
+    .container{
+        width: 95%;
+    }
+}
+
+@media(max-width:768px){
+
+    .main-title{
+        font-size: 30px;
+    }
+
+    .main-button{
+        width: 100%;
+    }
+
+    .footer{
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:500px){
+
+    .header{
+        height: 70px;
+    }
+
+    .logo{
+        font-size: 22px;
+    }
+
+    .main-title{
+        font-size: 25px;
+    }
+}

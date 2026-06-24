@@ -1,0 +1,139 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cảnh báo an toàn";
+    ViewData["AdminSection"] = "Cảnh báo an toàn";
+}
+
+<section class="admin-page-shell main"
+         data-safety-api="/api/SafetyWarning"
+         data-medicine-api="/api/Medicine"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">An toàn kê đơn</p>
+            <h1 class="admin-page-title">Cảnh báo an toàn</h1>
+            <p class="admin-page-subtitle">Theo dõi dị ứng, bệnh nền và tương tác thuốc trong hệ thống.</p>
+        </div>
+    </div>
+
+    <section class="table-wrapper" style="margin-bottom:16px;">
+        <div class="top-bar">
+            <div>
+                <h2>Dị ứng</h2>
+                <p class="admin-page-subtitle">Dùng cho cảnh báo kê đơn và dự đoán thuốc.</p>
+            </div>
+            <button class="add-btn" type="button" id="btnAddAllergy">+ Thêm dị ứng</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên dị ứng</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="allergyTable">
+                <tr><td colspan="4">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="table-wrapper" style="margin-bottom:16px;">
+        <div class="top-bar">
+            <div>
+                <h2>Bệnh nền</h2>
+                <p class="admin-page-subtitle">Các bệnh nền ảnh hưởng đến cảnh báo an toàn.</p>
+            </div>
+            <button class="add-btn" type="button" id="btnAddBackgroundDisease">+ Thêm bệnh nền</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên bệnh nền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="backgroundDiseaseTable">
+                <tr><td colspan="4">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="table-wrapper">
+        <div class="top-bar">
+            <div>
+                <h2>Tương tác thuốc</h2>
+                <p class="admin-page-subtitle">Thiết lập tương tác thuốc dùng trong kết quả dự đoán.</p>
+            </div>
+            <button class="add-btn" type="button" id="btnAddInteraction">+ Thêm tương tác</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thuốc 1</th>
+                    <th>Thuốc 2</th>
+                    <th>Mức độ</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="interactionTable">
+                <tr><td colspan="5">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+<div class="modal-backdrop hidden" id="safetyModalBackdrop">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="safetyModalTitle">Thêm dữ liệu</h2>
+            <button type="button" class="modal-close" id="btnCloseSafetyModal">×</button>
+        </div>
+
+        <form id="safetyForm" class="modal-form">
+            <input type="hidden" id="safetyMode">
+            <input type="hidden" id="entityId">
+
+            <div id="singleNameField">
+                <label for="entityName">Tên</label>
+                <input id="entityName" type="text">
+            </div>
+
+            <div id="interactionFields" class="hidden">
+                <label for="medicine1Id">Thuốc 1</label>
+                <select id="medicine1Id"></select>
+
+                <label for="medicine2Id">Thuốc 2</label>
+                <select id="medicine2Id"></select>
+
+                <label for="severityLevel">Mức độ</label>
+                <select id="severityLevel">
+                    <option value="1">Nhẹ</option>
+                    <option value="2">Trung bình</option>
+                    <option value="3">Nghiêm trọng</option>
+                </select>
+
+                <label for="interactionDescription">Mô tả</label>
+                <textarea id="interactionDescription" rows="4"></textarea>
+            </div>
+
+            <label class="checkbox-row" id="activeField">
+                <input id="entityIsActive" type="checkbox" checked>
+                Đang hoạt động
+            </label>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="btnCancelSafetyModal">Hủy</button>
+                <button type="submit" class="primary-btn">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/QuanLyDiUng.js" asp-append-version="true"></script>
+}

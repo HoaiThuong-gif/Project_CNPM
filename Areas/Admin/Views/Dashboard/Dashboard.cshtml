@@ -1,0 +1,106 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard";
+    ViewData["AdminSection"] = "Dashboard";
+}
+
+<section class="admin-page-shell main-content"
+         data-statistics-url="/api/admin/Dashboard/statistics"
+         data-users-api="/api/User"
+         data-users-url="@Url.Action("QuanLyNguoiDung", "Portal", new { area = "Admin" })"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">Chế độ quản trị</p>
+            <h1 class="admin-page-title">Tổng quan hệ thống</h1>
+            <p class="admin-page-subtitle">Theo dõi nhanh người dùng, dữ liệu thuốc và hoạt động gần đây.</p>
+        </div>
+    </div>
+
+    <section class="stats-grid">
+        <article class="card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 1a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.31 0-6 1.79-6 4v1h8v-1a5.8 5.8 0 0 1 1.67-4A8.5 8.5 0 0 0 8 14Zm8 0c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="totalUsers">--</h2>
+            <p>Người dùng đang hoạt động</p>
+        </article>
+
+        <article class="card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4Zm10 7h6V4h-6ZM4 20h6v-5H4Zm0-7h6v-2H4Zm10 7h6v-5h-6Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="totalPredictions">--</h2>
+            <p>Lượt dự đoán</p>
+        </article>
+
+        <article class="card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.12 5.88 18.24 10 10 18.24 5.88 14.12Zm0-2.83a2 2 0 0 1 2.83 0L21.07 7.17a2 2 0 0 1 0 2.83l-1.41 1.41-6.95-6.95Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="totalMedicines">--</h2>
+            <p>Thuốc đang hoạt động</p>
+        </article>
+
+        <article class="card">
+            <div class="admin-stat-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-3.17A3 3 0 0 0 13 2h-2a3 3 0 0 0-2.83 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM12 4a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1Zm3 9h-2v2h-2v-2H9v-2h2V9h2v2h2Z" fill="currentColor" /></svg>
+            </div>
+            <h2 id="totalDiseases">--</h2>
+            <p>Bệnh đang hoạt động</p>
+        </article>
+    </section>
+
+    <section class="table-section">
+        <div class="section-header">
+            <div>
+                <h2>Thuốc được tra cứu nhiều nhất</h2>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên thuốc</th>
+                    <th>Lượt tra cứu</th>
+                </tr>
+            </thead>
+            <tbody id="topMedicinesTable">
+                <tr>
+                    <td colspan="3">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="table-section">
+        <div class="section-header">
+            <div>
+                <h2>Tài khoản mới gần đây</h2>
+            </div>
+            <button id="btnViewAllUsers" class="admin-primary-button" type="button">Xem tất cả</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Người dùng</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Ngày tạo</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody id="recentUsersTable">
+                <tr>
+                    <td colspan="5">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="~/js/admin/Dashboard.js" asp-append-version="true"></script>
+}

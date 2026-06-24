@@ -1,0 +1,102 @@
+@{
+    Layout = null;
+    var returnUrl = ViewBag.ReturnUrl as string ?? string.Empty;
+    var loginMessage = ViewBag.LoginMessage as string ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | MedPredict</title>
+    <link rel="stylesheet" href="~/css/shared/PublicPortal.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/account/DangNhap.css" asp-append-version="true">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-aside">
+            <div class="portal-aside-content">
+                <div class="portal-brand">
+                    <span class="portal-brand-badge"></span>
+                    <span>MedPredict</span>
+                </div>
+
+                <h1 class="portal-title">Hệ thống dự đoán thuốc thông minh</h1>
+                <p class="portal-description">
+                    Nhập tên bệnh và thông tin sức khỏe để nhận gợi ý thuốc phù hợp, kèm cảnh
+                    báo dị ứng và chống chỉ định. Kết quả chỉ mang tính tham khảo.
+                </p>
+
+                <div class="portal-feature-list">
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Cảnh báo dị ứng và bệnh nền tự động</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Kho dữ liệu thuốc đang hoạt động trong hệ thống</span>
+                    </div>
+                    <div class="portal-feature">
+                        <span class="portal-feature-icon">•</span>
+                        <span>Thông tin chỉ mang tính tham khảo y tế</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-footer-note">© 2026 MedPredict · Phiên bản học tập</div>
+        </aside>
+
+        <main class="portal-main">
+            <div class="portal-main-inner">
+                <div class="portal-alert">
+                    Kết quả gợi ý thuốc chỉ mang tính tham khảo, không thay thế tư vấn từ bác sĩ hoặc dược sĩ có chuyên môn.
+                </div>
+
+                <div class="portal-tabs">
+                    <a class="portal-tab is-active" asp-controller="Account" asp-action="DangNhap">Đăng nhập</a>
+                    <a class="portal-tab" asp-controller="Account" asp-action="DangKy">Đăng ký</a>
+                </div>
+
+                <section class="portal-card">
+                    <h2 class="portal-card-title">Chào mừng trở lại</h2>
+                    <p class="portal-card-subtitle">Đăng nhập để sử dụng hệ thống tra cứu thuốc</p>
+
+                    <form class="portal-form login-form"
+                          data-login-api="/api/Auth/login"
+                          data-return-url="@returnUrl"
+                          data-home-url="@Url.Action("NhapThongTinBenh", "DuDoan")"
+                          data-admin-url="@Url.Action("Dashboard", "Portal", new { area = "Admin" })">
+                        @if (!string.IsNullOrWhiteSpace(loginMessage))
+                        {
+                            <div class="portal-alert" style="margin-bottom:0;background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;">
+                                @loginMessage
+                            </div>
+                        }
+
+                        <div class="portal-field">
+                            <label for="email">Email</label>
+                            <input class="portal-input" id="email" name="email" type="email" required>
+                        </div>
+
+                        <div class="portal-field">
+                            <label for="password">Mật khẩu</label>
+                            <input class="portal-input" id="password" name="password" type="password" placeholder="Nhập mật khẩu" required>
+                        </div>
+
+                        <button class="portal-button portal-button-primary btn-login" type="submit">
+                            Đăng nhập
+                        </button>
+                    </form>
+
+                    <div class="portal-meta">
+                        Chưa có tài khoản?
+                        <a class="portal-link-inline" asp-controller="Account" asp-action="DangKy">Đăng ký ngay</a>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="~/js/account/DangNhap.js" asp-append-version="true"></script>
+</body>
+</html>

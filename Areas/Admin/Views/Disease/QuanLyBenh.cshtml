@@ -1,0 +1,87 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý bệnh";
+    ViewData["AdminSection"] = "Quản lý bệnh";
+}
+
+<section class="admin-page-shell main"
+         data-disease-api="/api/Disease"
+         data-symptom-api="/api/Symptom"
+         data-login-url="@Url.Action("DangNhap", "Account", new { area = "" })">
+    <div class="admin-page-header">
+        <div>
+            <p class="admin-page-eyebrow">Quản lý bệnh</p>
+            <h1 class="admin-page-title">Quản lý bệnh</h1>
+            <p class="admin-page-subtitle">Theo dõi danh mục bệnh, mức độ và trạng thái trong hệ thống.</p>
+        </div>
+        <button class="add-btn" id="btnCreateDisease" type="button">+ Thêm bệnh</button>
+    </div>
+
+    <section class="table-wrapper">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm bệnh...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên bệnh</th>
+                    <th>Nhóm</th>
+                    <th>Mô tả</th>
+                    <th>Triệu chứng</th>
+                    <th>Mức độ</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="benhTable">
+                <tr>
+                    <td colspan="9">Đang tải dữ liệu...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</section>
+
+<div class="modal-backdrop hidden" id="diseaseModalBackdrop">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="diseaseModalTitle">Thêm bệnh</h2>
+            <button type="button" class="modal-close" id="btnCloseDiseaseModal">×</button>
+        </div>
+
+        <form id="diseaseForm" class="modal-form">
+            <input type="hidden" id="diseaseId">
+
+            <label for="diseaseName">Tên bệnh</label>
+            <input id="diseaseName" type="text" required>
+
+            <label for="diseaseGroup">Nhóm bệnh</label>
+            <input id="diseaseGroup" type="text" required>
+
+            <label for="diseaseDescription">Mô tả</label>
+            <textarea id="diseaseDescription" rows="4"></textarea>
+
+            <label for="diseaseSeverity">Mức độ</label>
+            <select id="diseaseSeverity">
+                <option value="1">Nhẹ</option>
+                <option value="2">Trung bình</option>
+                <option value="3">Nặng</option>
+            </select>
+
+            <label for="diseaseSymptoms">Triệu chứng liên quan</label>
+            <select id="diseaseSymptoms" multiple size="6"></select>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="btnCancelDiseaseModal">Hủy</button>
+                <button type="submit" class="primary-btn" id="btnSubmitDiseaseModal">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/QuanLyBenh.js" asp-append-version="true"></script>
+}
